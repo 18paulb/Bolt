@@ -1,0 +1,12 @@
+<form (ngSubmit)="test()">
+  <label>Image URL</label>
+  <input [(ngModel)]="imageUrl" name="imageURL" type="text" placeholder="Insert Image URL Here">
+
+  <label>Review Prompt Text</label>
+  <textarea [(ngModel)]="messageText" name="promptText" type="text" placeholder="Insert Review Prompt Text Here"></textarea>
+
+  <label>User Responses</label>
+  <input [(ngModel)]="suggestedResponses" name="userResponse" type="text" placeholder="Possible User Response Here">
+
+  <button type="submit"></button>
+</form>
