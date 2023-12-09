@@ -1,6 +1,6 @@
-
 import {MongoClient, ServerApiVersion} from "mongodb";
 import {ReviewTemplateModel} from "./models/ReviewTemplateModel.js";
+// import {ReviewTemplate} from "../../shared/models/ReviewTemplate.js";
 
 const uri = "mongodb+srv://brandonpaul:Sports18120@bolt.zjlyp8n.mongodb.net/?retryWrites=true&w=majority";
 
@@ -13,38 +13,21 @@ const client = new MongoClient(uri, {
     }
 });
 
-export async function run() {
-    try {
-        // Connect the client to the server	(optional starting in v4.7)
-        await client.connect();
-        // Send a ping to confirm a successful connection
-        await client.db("admin").command({ ping: 1 });
-        console.log("Pinged your deployment. You successfully connected to MongoDB!");
-    } catch (ex) {
-        console.log(ex)
-    }
-    finally {
-        // Ensures that the client will close when you finish/error
-        await client.close();
-    }
-}
-
-export async function createCollection() {
-    try {
-        // Connect the client to the server	(optional starting in v4.7)
-        await client.connect();
-        // Send a ping to confirm a successful connection
-        let database = client.db("Bolt");
-
-        const collectionName = "Templates";
-        await database.createCollection(collectionName);
-    } catch (ex) {
-        console.log(ex)
-    } finally {
-        // Ensures that the client will close when you finish/error
-        await client.close();
-    }
-}
+// export async function createCollection() {
+//     try {
+//         // Connect the client to the server	(optional starting in v4.7)
+//         await client.connect();
+//         // Send a ping to confirm a successful connection
+//         let database = client.db("Bolt");
+//
+//         const collectionName = "Templates";
+//         await database.createCollection(collectionName);
+//         await client.close();
+//
+//     } catch (ex) {
+//         console.log(ex)
+//     }
+// }
 
 export async function saveReviewTemplate(template) {
     try {
@@ -61,5 +44,41 @@ export async function saveReviewTemplate(template) {
     }
 }
 
-// run().catch(console.dir);
-// createCollection().catch(console.dir)
+export async function getAllTemplates(ownerId) {
+    try {
+        await client.connect()
+        let db = client.db("Bolt")
+
+        // Define the filter criteria
+        const filter = {};
+        filter["ownerId"] = ownerId;
+
+        let collection = db.collection("Templates")
+
+        // Fetch documents matching the filter criteria
+        const documents = await collection.find(filter).toArray();
+
+        let results = []
+
+        // Get all results and make them into the shared ReviewTemplate model
+        for (let i = 0; i < documents.length; ++i) {
+            let doc = documents[i];
+            results.push(new ReviewTemplateModel(doc["imageUrl"], doc["messageText"], doc["messageDescription"], doc["suggestedResponses"], doc["ownerId"]))
+        }
+
+        // Process the fetched documents
+        console.log(results);
+
+        await client.close()
+
+        return results;
+
+    } catch (ex) {
+        console.log(ex)
+    }
+}
+
+
+// let results = await getAllTemplates("brandon").catch(console.dir)
+// console.log(results)
+

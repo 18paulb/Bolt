@@ -14,33 +14,38 @@
 
 'use strict';
 
-const util= require('util');
-const config = require('./config');
-const rbmApiHelper = require('@google/rcsbusinessmessaging');
-const privateKey = require('./rbm-credentials.json');
+import util from 'util'
+import {config} from './config.js'
+import rbmApiHelper from '@google/rcsbusinessmessaging'
+import privateKey from './rbm-credentials.json' assert { type: 'json' };
+
 
 rbmApiHelper.initRbmApi(privateKey);
 rbmApiHelper.setAgentId(config.agentId);
 
-function sendRichCard(suggestions, imageUrl, messageText, messageDescription) {
+export function sendReviewTemplate(reviewTemplate) {
 
-    const suggests= [
-        {
+    const suggestions = []
+
+    for (let i = 0; i < reviewTemplate["suggestedResponses"].length; ++i) {
+        suggestions.push(        {
             reply: {
-                'text': suggestions,
-                'postbackData': 'suggestion1'
+                'text': reviewTemplate["suggestedResponses"][i],
+                'postbackData': 'suggestion'+i
             },
-        },
-    ]
+        },)
+    }
+
 
     const params = {
-        messageText: messageText,
-        messageDescription: messageDescription,
+        messageText: reviewTemplate["messageText"],
+        messageDescription: reviewTemplate["messageDescription"],
         msisdn: config.phoneNumber,
-        suggestions: suggests,
-        imageUrl: imageUrl,
+        suggestions: suggestions,
+        imageUrl: reviewTemplate["imageUrl"],
         height: 'MEDIUM'
     }
+
 
     // Send the card to the device
     rbmApiHelper.sendRichCard(params, function(response, err) {
@@ -54,8 +59,4 @@ function sendRichCard(suggestions, imageUrl, messageText, messageDescription) {
             }
         }
     );
-}
-
-module.exports = {
-    sendRichCard
 }
