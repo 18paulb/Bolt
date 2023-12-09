@@ -4,6 +4,7 @@ export class ReviewTemplateModel {
     messageDescription
     suggestedResponses
     ownerId
+    objectId
 
     constructor(imageUrl, messageText, messageDescription, suggestedResponse, ownerId) {
         this.imageUrl = imageUrl;

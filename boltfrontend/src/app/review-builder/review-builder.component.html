@@ -2,11 +2,22 @@
   <label>Image URL</label>
   <input [(ngModel)]="imageUrl" name="imageURL" type="text" placeholder="Insert Image URL Here">
 
-  <label>Review Prompt Text</label>
-  <textarea [(ngModel)]="messageText" name="promptText" type="text" placeholder="Insert Review Prompt Text Here"></textarea>
+  <label>Message Text</label>
+  <textarea [(ngModel)]="messageText" name="messageText" type="text" placeholder="Insert Message Text Here"></textarea>
+
+  <label>Message Description</label>
+  <textarea [(ngModel)]="messageDescription" name="messageDescription" type="text" placeholder="Insert Message Description Here"></textarea>
 
   <label>User Responses</label>
-  <input [(ngModel)]="suggestedResponses" name="userResponse" type="text" placeholder="Possible User Response Here">
+  <div *ngFor="let response of suggestedResponses; let i = index">
+    <input [(ngModel)]="suggestedResponses[i]" name="suggestedResponse{{i}}" type="text">
+    <button type="button" (click)="removeUserResponse(i)">Remove</button>
+  </div>
+  <input [(ngModel)]="newResponse" name="newResponse" type="text" placeholder="Insert a new response">
+  <button type="button" (click)="addUserResponse()">Add Response</button>
 
-  <button type="submit">Submit</button>
+  <br>
+  <br>
+
+  <button type="submit">Save Template</button>
 </form>
