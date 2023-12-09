@@ -4,10 +4,10 @@ export class ReviewTemplate {
     messageDescription: string;
     suggestedResponses: Array<string>
 
-  constructor(imageUrl:string, messageText:string, messageDescription:string, suggestedResponse: Array<string>) {
+  constructor(imageUrl:string, messageText:string, messageDescription:string, suggestedResponses: Array<string>) {
       this.imageUrl = imageUrl;
       this.messageText = messageText;
       this.messageDescription = messageDescription;
-      this.suggestedResponses = suggestedResponse;
+      this.suggestedResponses = suggestedResponses;
   }
 }

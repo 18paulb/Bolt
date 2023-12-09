@@ -6,11 +6,13 @@ import {AppComponent} from './app.component';
 import {ReviewBuilderComponent} from './review-builder/review-builder.component';
 import {FormsModule} from "@angular/forms";
 import {HttpClientModule} from "@angular/common/http";
+import { TemplateBrowserComponent } from './template-browser/template-browser.component';
 
 @NgModule({
   declarations: [
     AppComponent,
-    ReviewBuilderComponent
+    ReviewBuilderComponent,
+    TemplateBrowserComponent
   ],
   imports: [
     BrowserModule,

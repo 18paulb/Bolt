@@ -12,8 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-
-const config = {
+export const config = {
     // Your test RBM phone number
     phoneNumber: '+13853353799',
 
@@ -22,5 +21,3 @@ const config = {
     // RBM Management API
     agentId: 'test-mye8fy@rbm.goog'
 };
-
-module.exports = config;
