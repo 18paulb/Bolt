@@ -10,7 +10,7 @@ import {ReviewTemplate} from "../../../../shared/models/ReviewTemplate";
 })
 export class TemplateBrowserComponent implements OnInit {
 
-  constructor(private http:HttpClient) {
+  constructor(private http: HttpClient) {
   }
 
   ngOnInit(): void {
@@ -20,15 +20,19 @@ export class TemplateBrowserComponent implements OnInit {
   reviewTemplates: ReviewTemplate[] = []
 
   async getReviewTemplates() {
-    let results:any = await lastValueFrom(this.http.get("http://localhost:3000/getReviewTemplates/"+"brandon"))
+    let results: any = await lastValueFrom(this.http.get("http://localhost:3000/getReviewTemplates/" + "brandon"))
     console.log(results)
     for (let i = 0; i < results.length; ++i) {
       let result = results[i]
-      this.reviewTemplates.push(new ReviewTemplate(result["imageUrl"], result["messageText"], result["messageDescription"], result["suggestedResponses"]))
+      this.reviewTemplates.push(new ReviewTemplate(result["imageUrl"], result["messageText"], result["messageDescription"], result["suggestedResponses"], result["objectId"]))
     }
   }
 
-  async sendReviewTemplate(template:ReviewTemplate) {
+  async sendReviewTemplate(template: ReviewTemplate) {
     await lastValueFrom(this.http.post("http://localhost:3000/sendReviewTemplate", template))
+  }
+
+  async deleteReviewTemplate(template: ReviewTemplate) {
+    await lastValueFrom(this.http.delete("http://localhost:3000/deleteTemplate/" + template.objectId));
   }
 }

@@ -1,4 +1,4 @@
-import {MongoClient, ServerApiVersion} from "mongodb";
+import {MongoClient, ObjectId, ServerApiVersion} from "mongodb";
 import {ReviewTemplateModel} from "./models/ReviewTemplateModel.js";
 // import {ReviewTemplate} from "../../shared/models/ReviewTemplate.js";
 
@@ -44,6 +44,24 @@ export async function saveReviewTemplate(template) {
     }
 }
 
+export async function deleteTemplate(templateId) {
+    try {
+        await client.connect();
+        let db = client.db("Bolt");
+        let collection =  db.collection('Templates');
+
+        const objectId = new ObjectId(templateId); // Create an ObjectId from the id string
+        // Specify the filter criteria to delete by _id
+        const filter = { _id: objectId };
+
+        const result = await collection.deleteOne(filter);
+
+        await client.close();
+    } catch (ex) {
+        console.log(ex);
+    }
+}
+
 export async function getAllTemplates(ownerId) {
     try {
         await client.connect()
@@ -63,7 +81,9 @@ export async function getAllTemplates(ownerId) {
         // Get all results and make them into the shared ReviewTemplate model
         for (let i = 0; i < documents.length; ++i) {
             let doc = documents[i];
-            results.push(new ReviewTemplateModel(doc["imageUrl"], doc["messageText"], doc["messageDescription"], doc["suggestedResponses"], doc["ownerId"]))
+            let model = new ReviewTemplateModel(doc.imageUrl, doc.messageText, doc.messageDescription, doc.suggestedResponses, doc.ownerId)
+            model.objectId = doc._id.toString()
+            results.push(model)
         }
 
         // Process the fetched documents

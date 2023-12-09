@@ -21,9 +21,20 @@ export class ReviewBuilderComponent {
 
   suggestedResponses:Array<string> = ["yes", "no"]
 
+  newResponse:string = ""
+
   async test() {
-    let review:ReviewTemplate = new ReviewTemplate(this.imageUrl, this.messageText, this.messageDescription, this.suggestedResponses)
+    let review:ReviewTemplate = new ReviewTemplate(this.imageUrl, this.messageText, this.messageDescription, this.suggestedResponses, "")
     const data = await lastValueFrom(this.http.post("http://localhost:3000/reviewTemplate", review));
     console.log(data)
+  }
+
+  addUserResponse() {
+    this.suggestedResponses.push(this.newResponse);
+    this.newResponse = ""
+  }
+
+  removeUserResponse(index: number) {
+    this.suggestedResponses.splice(index, 1);
   }
 }
