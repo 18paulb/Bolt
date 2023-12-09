@@ -1,9 +1,11 @@
-const express = require('express');
+import express from 'express';
 const app = express();
 const port = 3000;
-const cors = require('cors');
+import cors from 'cors'
+// import {ReviewTemplate} from "../shared/models/ReviewTemplate.ts";
+import * as db from './Database/db.js'
 
-const richCard = require('./Agents/richCard')
+// const richCard = require('./Agents/richCard')
 
 app.use(cors({
     origin: 'http://localhost:4200' // Angular server
@@ -12,18 +14,19 @@ app.use(cors({
 app.use(express.json());
 
 app.get('/', (req, res) => {
-    res.json({ message: 'Hello World!' })
+    res.json({message: 'Hello World!'})
 });
 
-app.post('/richCard', (req, res) => {
+app.post('/reviewTemplate', (req, res) => {
     const data = req.body;
+    // console.log(data);
 
-    console.log(data);
+    // let review = new ReviewTemplate(data.imageUrl, data.messageText, data.messageDescription, data.suggestedResponses)
 
-    richCard.sendRichCard(data["suggestedResponses"], data["imageUrl"], data["messageText"], data["messageDescription"])
+    db.saveReviewTemplate(data).catch(console.dir)
 
     res.status(200)
-    res.json({ message: 'Hello World!' })
+    res.json({message: 'Review Template Saved Successfully'})
 })
 
 app.listen(port, () => {
