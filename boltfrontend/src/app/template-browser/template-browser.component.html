@@ -1,0 +1,9 @@
+<div *ngFor="let template of reviewTemplates">
+  <p>ImageUrl: {{template.imageUrl}}</p>
+  <p>Message Text: {{template.messageText}}</p>
+  <p>Message Description: {{template.messageDescription}}</p>
+  <p *ngFor="let suggestedResponse of template.suggestedResponses">
+    Suggested Response: {{suggestedResponse}}
+  </p>
+  <button (click)="sendReviewTemplate(template)">send this template</button>
+</div>
