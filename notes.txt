@@ -1,0 +1,17 @@
+Agents:
+1 agent per company
+An agent is a logical entity for a business or a specific business function.
+Messages between a user and an agent appear in an RCS-enabled messaging app, such as the Messages app, on the user's device.
+The Messages app displays branding and profile information for your agent, including name, logo, description, contact information, and URLs.
+
+You could create an agent for Growing Tree Bank that allows users to interact with various aspects of the bank, such as the Customer Care and Mortgage department.
+Alternatively, you could create an agent for each department, for example, Growing Tree Bank Customer Care and Growing Tree Bank Mortgages.
+Before creating multiple agents for one business, consider the user experience implications and refer to the
+
+Things like the config file agentId would be used for every single message sent by the company
+Same for the private key
+
+
+How To Keep Track of saved 'templates' of the user
+ - Store all the JSON of the message
+ - IE for a RichCard message you would store the imageURL, messageText, messageDescription, userSuggestions etc. and pull those whenever the template needs to be sent
