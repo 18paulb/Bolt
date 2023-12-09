@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { HttpClient} from "@angular/common/http";
 import { lastValueFrom} from "rxjs";
+import { ReviewTemplate } from "../../../../shared/models/ReviewTemplate"
 
 @Component({
   selector: 'app-review-builder',
@@ -12,25 +13,17 @@ export class ReviewBuilderComponent {
   constructor(private http: HttpClient) {
   }
 
+  imageUrl:string = "https://storage.googleapis.com/kitchen-sink-sample-images/cute-dog.jpg"
 
-  imageUrl:String = "https://storage.googleapis.com/kitchen-sink-sample-images/cute-dog.jpg"
+  messageText:string = "TEST"
 
-  messageText:String = "TEST"
+  messageDescription:string = "This is a test from a node.js server, is this cool?"
 
-  messageDescription:String = "This is a test from a node.js server, is this cool?"
-
-  suggestedResponses:String = "yes"
+  suggestedResponses:Array<string> = ["yes", "no"]
 
   async test() {
-
-    let body = {
-      "imageUrl": this.imageUrl,
-      "messageText": this.messageText,
-      "messageDescription": this.messageDescription,
-      "suggestedResponses": this.suggestedResponses
-    }
-
-    const data = await lastValueFrom(this.http.post("http://localhost:3000/richCard", body));
+    let review:ReviewTemplate = new ReviewTemplate(this.imageUrl, this.messageText, this.messageDescription, this.suggestedResponses)
+    const data = await lastValueFrom(this.http.post("http://localhost:3000/reviewTemplate", review));
     console.log(data)
   }
 }
