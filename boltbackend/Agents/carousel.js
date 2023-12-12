@@ -1,7 +1,7 @@
 import {config} from './config.js'
 import rbmApiHelper from '@google/rcsbusinessmessaging'
 import privateKey from './rbm-credentials.json' assert {type: 'json'};
-import * as abandonedCart from '../ShopifyDataFetchers/AbandonedCartFetcher.js'
+import * as abandonedCart from '../CRMIntegration/Shopify/ShopifyDataFetchers/AbandonedCartFetcher.js'
 rbmApiHelper.initRbmApi(privateKey);
 rbmApiHelper.setAgentId(config.agentId);
 

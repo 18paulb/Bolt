@@ -1,3 +1,6 @@
+import shopify from '../shopify.js'
+
+
 // TODO: Eventually this will be replaced with a call to grab abandoned shopping cart data from Shopify
 export function getAbandonedCarts() {
     return [
@@ -23,7 +26,7 @@ export function getAbandonedCarts() {
             "name": "Pants",
             "price": 45,
             "image": "https://images.rawpixel.com/image_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIzLTA4L3Jhd3BpeGVsX29mZmljZV8yNV9waG90b19vZl93aGl0ZV9tYWxlX3RzaGlydF9tb2NrdXBfd2hpdGVfdHNoaV85YjNmOWZjZS03MTZkLTQxYmUtODkzZS05MzkwZWY1NmZiZmFfMi5qcGc.jpg",
-            "cartUrl": "https://www.google.com/"
+            "cartUrl": "https://www.google.com/xx"
         }
     ]
 }

@@ -45,7 +45,6 @@ export function sendReviewTemplate(reviewTemplate) {
         height: 'MEDIUM'
     }
 
-
     // Send the card to the device
     rbmApiHelper.sendRichCard(params, function(response, err) {
             if (err !== undefined) {

@@ -95,7 +95,3 @@ export async function getAllTemplates(ownerId) {
     }
 }
 
-
-// let results = await getAllTemplates("brandon").catch(console.dir)
-// console.log(results)
-
