@@ -18,9 +18,12 @@ export async function sendCarousel(cartData) {
                 description: `Priced at $${item.price}`,
                 suggestions: [
                     {
-                        reply: {
+                        action: {
                             text: item.cartUrl,
                             postbackData: `card_${i}`,
+                            openUrlAction: {
+                                url: item.cartUrl
+                            }
                         }
                     }
                 ],
@@ -46,4 +49,3 @@ export async function sendCarousel(cartData) {
         console.log(response);
     });
 }
-

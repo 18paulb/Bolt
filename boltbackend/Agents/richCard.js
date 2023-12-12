@@ -25,7 +25,7 @@ rbmApiHelper.setAgentId(config.agentId);
 
 export function sendReviewTemplate(reviewTemplate) {
 
-    const suggestions = []
+    let suggestions = []
 
     for (let i = 0; i < reviewTemplate["suggestedResponses"].length; ++i) {
         suggestions.push(        {
@@ -35,7 +35,6 @@ export function sendReviewTemplate(reviewTemplate) {
             },
         })
     }
-
 
     const params = {
         messageText: reviewTemplate["messageText"],

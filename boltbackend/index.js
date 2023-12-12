@@ -22,8 +22,6 @@ app.get('/', (req, res) => {
 
 app.post('/reviewTemplate', (req, res) => {
     const data = req.body;
-    // console.log(data);
-
     // let review = new ReviewTemplate(data.imageUrl, data.messageText, data.messageDescription, data.suggestedResponses)
 
     db.saveReviewTemplate(data).catch(console.dir)
@@ -32,15 +30,26 @@ app.post('/reviewTemplate', (req, res) => {
     res.json({message: 'Review Template Saved Successfully'})
 })
 
-app.post('/sendAbandonedCart', (req, res) => {
+app.post('/surveyTemplate', (req, res) => {
+
+})
+
+app.post('/sendAbandonedCart', async (req, res) => {
 
     let cartData = abandonedCart.getAbandonedCarts()
-    carousel.sendCarousel(cartData).catch(console.dir);
+    await carousel.sendCarousel(cartData)
+        .then(response => {
+            res.status(200)
+            res.json({message: 'Abandoned Cart Sent'})
+        })
+        .catch(err => {
+            res.status(400)
+            res.json({message: err})
+        });
 })
 
 app.post('/sendReviewTemplate', (req, res) => {
     const data = req.body;
-
     richCard.sendReviewTemplate(data)
 })
 
@@ -56,9 +65,14 @@ app.delete('/deleteTemplate/:templateId', async (req, res) => {
     const id = req.params.templateId;
 
     await db.deleteTemplate(id)
-
-    res.status(200)
-    res.json({message: 'Template Deleted Successfully'})
+        .then(response => {
+            res.status(200)
+            res.json({message: 'Template Deleted Successfully'})
+        })
+        .catch(err => {
+            res.status(400)
+            res.json({message: err})
+        })
 })
 
 app.listen(port, () => {
