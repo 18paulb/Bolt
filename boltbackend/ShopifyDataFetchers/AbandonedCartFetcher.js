@@ -5,25 +5,25 @@ export function getAbandonedCarts() {
             "name": "Shoes",
             "price": 12,
             "image": 'https://images.rawpixel.com/image_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIzLTA4L3Jhd3BpeGVsX29mZmljZV8yNV9waG90b19vZl93aGl0ZV9tYWxlX3RzaGlydF9tb2NrdXBfd2hpdGVfdHNoaV85YjNmOWZjZS03MTZkLTQxYmUtODkzZS05MzkwZWY1NmZiZmFfMi5qcGc.jpg',
-            "cartUrl": "www.abandonedCart.com"
+            "cartUrl": "https://www.google.com/"
         },
         {
             "name": "T-Shirt",
             "price": 34,
             "image": "https://images.rawpixel.com/image_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIzLTA4L3Jhd3BpeGVsX29mZmljZV8yNV9waG90b19vZl93aGl0ZV9tYWxlX3RzaGlydF9tb2NrdXBfd2hpdGVfdHNoaV85YjNmOWZjZS03MTZkLTQxYmUtODkzZS05MzkwZWY1NmZiZmFfMi5qcGc.jpg",
-            "cartUrl": "www.abandonedCart.com"
+            "cartUrl": "https://www.google.com/"
         },
         {
             "name": "Necklace",
             "price": 102,
             "image": "https://t3.ftcdn.net/jpg/04/14/59/14/360_F_414591428_9pRZqRIygbSDvTMvln3v0Ls3vuR09nv8.jpg",
-            "cartUrl": "www.abandonedCart.com"
+            "cartUrl": "https://www.google.com/"
         },
         {
             "name": "Pants",
             "price": 45,
             "image": "https://images.rawpixel.com/image_800/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIzLTA4L3Jhd3BpeGVsX29mZmljZV8yNV9waG90b19vZl93aGl0ZV9tYWxlX3RzaGlydF9tb2NrdXBfd2hpdGVfdHNoaV85YjNmOWZjZS03MTZkLTQxYmUtODkzZS05MzkwZWY1NmZiZmFfMi5qcGc.jpg",
-            "cartUrl": "www.abandonedCart.com"
+            "cartUrl": "https://www.google.com/"
         }
     ]
 }
