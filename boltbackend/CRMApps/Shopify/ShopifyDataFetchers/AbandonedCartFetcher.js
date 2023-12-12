@@ -1,4 +1,13 @@
-import shopify from '../shopify.js'
+import {shopify} from '../shopify.js'
+
+async function fetchAbandonedCheckouts() {
+ try {
+  const response = await shopify.get('/admin/api/2023-01/checkouts.json');
+  return response.data.checkouts; // or however the data is structured in the response
+ } catch (error) {
+  console.error('Error fetching abandoned checkouts:', error);
+ }
+}
 
 
 // TODO: Eventually this will be replaced with a call to grab abandoned shopping cart data from Shopify

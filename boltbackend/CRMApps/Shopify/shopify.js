@@ -6,7 +6,6 @@ export const shopify = shopifyApi({
     // The next 4 values are typically read from environment variables for added security
     apiKey: 'APIKeyFromPartnersDashboard',
     apiSecretKey: 'APISecretFromPartnersDashboard',
-    scopes: ['read_products'],
+    scopes: ['read_products', 'read_checkouts'],
     hostName: 'ngrok-tunnel-address',
-    ...
 });
