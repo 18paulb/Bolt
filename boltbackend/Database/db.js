@@ -86,9 +86,6 @@ export async function getAllTemplates(ownerId) {
             results.push(model)
         }
 
-        // Process the fetched documents
-        console.log(results);
-
         await client.close()
 
         return results;

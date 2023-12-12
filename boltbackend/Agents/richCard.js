@@ -33,7 +33,7 @@ export function sendReviewTemplate(reviewTemplate) {
                 'text': reviewTemplate["suggestedResponses"][i],
                 'postbackData': 'suggestion'+i
             },
-        },)
+        })
     }
 
 

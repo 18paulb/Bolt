@@ -23,7 +23,7 @@ export class ReviewBuilderComponent {
 
   newResponse:string = ""
 
-  async test() {
+  async sendText() {
     let review:ReviewTemplate = new ReviewTemplate(this.imageUrl, this.messageText, this.messageDescription, this.suggestedResponses, "")
     const data = await lastValueFrom(this.http.post("http://localhost:3000/reviewTemplate", review));
     console.log(data)
