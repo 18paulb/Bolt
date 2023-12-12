@@ -7,12 +7,14 @@ import {ReviewBuilderComponent} from './review-builder/review-builder.component'
 import {FormsModule} from "@angular/forms";
 import {HttpClientModule} from "@angular/common/http";
 import { TemplateBrowserComponent } from './template-browser/template-browser.component';
+import { AbandonedCartBuilderComponent } from './abandoned-cart-builder/abandoned-cart-builder.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     ReviewBuilderComponent,
-    TemplateBrowserComponent
+    TemplateBrowserComponent,
+    AbandonedCartBuilderComponent
   ],
   imports: [
     BrowserModule,
