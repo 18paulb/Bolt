@@ -1,57 +1,65 @@
-import express from 'express';
-import cors from 'cors'
+import express from "express";
+import cors from "cors";
 // import {ReviewTemplate} from "../shared/models/ReviewTemplate.js";
-import * as db from './Database/db.js'
-import * as richCard from './Agents/richCard.js'
+import * as db from "./Database/db.js";
+import * as richCard from "./Agents/richCard.js";
 
 const app = express();
 const port = 3000;
 
-app.use(cors({
-    origin: 'http://localhost:4200' // Angular server
-}));
+app.use(
+  cors({
+    origin: "http://localhost:4200", // Angular server
+  })
+);
 // Middleware to parse the body of the request
 app.use(express.json());
 
-app.get('/', (req, res) => {
-    res.json({message: 'Hello World!'})
+app.get("/", (req, res) => {
+  res.json({ message: "Hello World!" });
 });
 
-app.post('/reviewTemplate', (req, res) => {
+app.post("/reviewTemplate", async (req, res) => {
+  try {
     const data = req.body;
     // console.log(data);
 
     // let review = new ReviewTemplate(data.imageUrl, data.messageText, data.messageDescription, data.suggestedResponses)
 
-    db.saveReviewTemplate(data).catch(console.dir)
+    await db.saveReviewTemplate(data);
 
-    res.status(200)
-    res.json({message: 'Review Template Saved Successfully'})
-})
+    res.status(200);
+    res.json({ message: "Review Template Saved Successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500);
+    res.json({ message: "An error occurred while saving the review template" });
+  }
+});
 
-app.post('/sendReviewTemplate', (req, res) => {
-    const data = req.body;
+app.post("/sendReviewTemplate", (req, res) => {
+  const data = req.body;
 
-    richCard.sendReviewTemplate(data)
-})
+  richCard.sendReviewTemplate(data);
+});
 
-app.get('/getReviewTemplates/:userId', async (req, res) => {
-    const userId = req.params.userId;
-    let result = await db.getAllTemplates(userId)
+app.get("/getReviewTemplates/:userId", async (req, res) => {
+  const userId = req.params.userId;
+  let result = await db.getAllTemplates(userId);
 
-    res.status(200)
-    res.json(result)
-})
+  res.status(200);
+  res.json(result);
+});
 
-app.delete('/deleteTemplate/:templateId', async (req, res) => {
-    const id = req.params.templateId;
+app.delete("/deleteTemplate/:templateId", async (req, res) => {
+  const id = req.params.templateId;
 
-    await db.deleteTemplate(id)
+  await db.deleteTemplate(id);
 
-    res.status(200)
-    res.json({message: 'Template Deleted Successfully'})
-})
+  res.status(200);
+  res.json({ message: "Template Deleted Successfully" });
+});
 
 app.listen(port, () => {
-    console.log(`Server listening at http://localhost:${port}`);
+  console.log(`Server listening at http://localhost:${port}`);
 });
