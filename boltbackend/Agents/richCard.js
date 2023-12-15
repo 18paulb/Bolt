@@ -25,7 +25,7 @@ rbmApiHelper.setAgentId(config.agentId);
 
 export function sendReviewTemplate(reviewTemplate) {
 
-    const suggestions = []
+    let suggestions = []
 
     for (let i = 0; i < reviewTemplate["suggestedResponses"].length; ++i) {
         suggestions.push(        {
@@ -33,9 +33,8 @@ export function sendReviewTemplate(reviewTemplate) {
                 'text': reviewTemplate["suggestedResponses"][i],
                 'postbackData': 'suggestion'+i
             },
-        },)
+        })
     }
-
 
     const params = {
         messageText: reviewTemplate["messageText"],
@@ -45,7 +44,6 @@ export function sendReviewTemplate(reviewTemplate) {
         imageUrl: reviewTemplate["imageUrl"],
         height: 'MEDIUM'
     }
-
 
     // Send the card to the device
     rbmApiHelper.sendRichCard(params, function(response, err) {

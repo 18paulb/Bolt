@@ -86,9 +86,6 @@ export async function getAllTemplates(ownerId) {
             results.push(model)
         }
 
-        // Process the fetched documents
-        console.log(results);
-
         await client.close()
 
         return results;
@@ -97,8 +94,4 @@ export async function getAllTemplates(ownerId) {
         console.log(ex)
     }
 }
-
-
-// let results = await getAllTemplates("brandon").catch(console.dir)
-// console.log(results)
 
