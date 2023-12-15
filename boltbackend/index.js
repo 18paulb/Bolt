@@ -3,7 +3,7 @@ import cors from 'cors'
 import * as db from './Database/db.js'
 import * as richCard from './Agents/richCard.js'
 import * as carousel from './Agents/carousel.js'
-import * as abandonedCart from './ShopifyDataFetchers/AbandonedCartFetcher.js'
+import * as abandonedCart from './CRMApps/Shopify/ShopifyDataFetchers/AbandonedCartFetcher.js'
 // import {ReviewTemplate} from "../shared/models/ReviewTemplate.js";
 
 
