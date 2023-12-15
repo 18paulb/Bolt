@@ -7,6 +7,8 @@ import {ReviewBuilderComponent} from './review-builder/review-builder.component'
 import {FormsModule} from "@angular/forms";
 import {HttpClientModule} from "@angular/common/http";
 import { TemplateBrowserComponent } from './template-browser/template-browser.component';
+
+import { DeviceFrameComponent } from './device-frame/device-frame.component';
 import { AbandonedCartBuilderComponent } from './abandoned-cart-builder/abandoned-cart-builder.component';
 import { SurveyBuilderComponent } from './survey-builder/survey-builder.component';
 
@@ -15,6 +17,7 @@ import { SurveyBuilderComponent } from './survey-builder/survey-builder.componen
     AppComponent,
     ReviewBuilderComponent,
     TemplateBrowserComponent,
+    DeviceFrameComponent
     AbandonedCartBuilderComponent,
     SurveyBuilderComponent
   ],
