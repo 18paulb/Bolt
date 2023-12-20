@@ -17,7 +17,7 @@ import { SurveyBuilderComponent } from './survey-builder/survey-builder.componen
     AppComponent,
     ReviewBuilderComponent,
     TemplateBrowserComponent,
-    DeviceFrameComponent
+    DeviceFrameComponent,
     AbandonedCartBuilderComponent,
     SurveyBuilderComponent
   ],

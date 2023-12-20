@@ -37,8 +37,10 @@ app.post("/reviewTemplate", async (req, res) => {
   }
 });
 
-app.post('/surveyTemplate', (req, res) => {
+app.post('/surveyTemplate', async(req, res) => {
+    const data = req.body;
 
+    await db.saveSurveyTemplate(data)
 })
 
 app.post('/sendAbandonedCart', async (req, res) => {

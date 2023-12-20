@@ -1,5 +1,6 @@
 import {MongoClient, ObjectId, ServerApiVersion} from "mongodb";
 import {ReviewTemplateModel} from "./models/ReviewTemplateModel.js";
+import {SurveyModel} from "./models/SurveyModel.js";
 // import {ReviewTemplate} from "../../shared/models/ReviewTemplate.js";
 
 const uri = "mongodb+srv://brandonpaul:Sports18120@bolt.zjlyp8n.mongodb.net/?retryWrites=true&w=majority";
@@ -12,22 +13,6 @@ const client = new MongoClient(uri, {
         deprecationErrors: true,
     }
 });
-
-// export async function createCollection() {
-//     try {
-//         // Connect the client to the server	(optional starting in v4.7)
-//         await client.connect();
-//         // Send a ping to confirm a successful connection
-//         let database = client.db("Bolt");
-//
-//         const collectionName = "Templates";
-//         await database.createCollection(collectionName);
-//         await client.close();
-//
-//     } catch (ex) {
-//         console.log(ex)
-//     }
-// }
 
 export async function saveReviewTemplate(template) {
     try {
@@ -95,3 +80,34 @@ export async function getAllTemplates(ownerId) {
     }
 }
 
+export async function saveSurvey(survey){
+    try {
+        await client.connect()
+        let db = client.db("Bolt")
+
+        let surveyModel = new SurveyModel(survey.phoneNumber, survey.questions)
+
+        await db.collection('Survey').insertOne(surveyModel);
+
+        await client.close();
+
+    } catch (ex) {
+        console.log(ex)
+    }
+}
+
+export async function saveSurveyTemplate(survey){
+    try {
+        await client.connect()
+        let db = client.db("Bolt")
+
+        let collection = db.collection("Templates")
+
+        await db.collection('Templates').insertOne(surveyModel);
+
+        await client.close();
+
+    } catch (ex) {
+        console.log(ex)
+    }
+}
