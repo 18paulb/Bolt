@@ -2,6 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {lastValueFrom} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {ReviewTemplate} from "../../../../shared/models/ReviewTemplate";
+import {SurveyTemplate} from "../../../../shared/models/SurveyTemplate";
 
 @Component({
   selector: 'app-template-browser',
@@ -18,13 +19,26 @@ export class TemplateBrowserComponent implements OnInit {
   }
 
   reviewTemplates: ReviewTemplate[] = []
+  surveyTemplates: SurveyTemplate[] = []
 
   async getReviewTemplates() {
+
+    // Wipe out the templates
+    this.reviewTemplates = []
+
     let results: any = await lastValueFrom(this.http.get("http://localhost:3000/getReviewTemplates/" + "brandon"))
     console.log(results)
     for (let i = 0; i < results.length; ++i) {
       let result = results[i]
-      this.reviewTemplates.push(new ReviewTemplate(result["imageUrl"], result["messageText"], result["messageDescription"], result["suggestedResponses"], result["objectId"]))
+
+      if (result.templateType === "Review") {
+        this.reviewTemplates.push(new ReviewTemplate(result["imageUrl"], result["messageText"], result["messageDescription"], result["suggestedResponses"], result["objectId"]))
+      }
+
+      if (result.templateType === "Survey") {
+        debugger
+        this.surveyTemplates.push(new SurveyTemplate(result["questions"]))
+      }
     }
   }
 
@@ -34,5 +48,6 @@ export class TemplateBrowserComponent implements OnInit {
 
   async deleteReviewTemplate(template: ReviewTemplate) {
     await lastValueFrom(this.http.delete("http://localhost:3000/deleteTemplate/" + template.objectId));
+    this.getReviewTemplates().catch(console.dir)
   }
 }

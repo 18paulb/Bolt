@@ -1,7 +1,9 @@
 export class SurveyTemplateModel {
     questions
+    ownerId
 
-    constructor(questions) {
+    constructor(questions, ownerId) {
         this.questions = questions;
+        this.ownerId = ownerId
     }
 }

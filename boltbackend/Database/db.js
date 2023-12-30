@@ -67,10 +67,22 @@ export async function getAllTemplates(ownerId) {
 
         // Get all results and make them into the shared ReviewTemplate model
         for (let i = 0; i < documents.length; ++i) {
-            let doc = documents[i];
-            let model = new ReviewTemplateModel(doc.imageUrl, doc.messageText, doc.messageDescription, doc.suggestedResponses, doc.ownerId)
-            model._id = doc._id.toString()
-            results.push(model)
+            let doc = documents[i]
+
+            if (doc.templateType === "Review") {
+                let model = new ReviewTemplateModel(doc.imageUrl, doc.messageText, doc.messageDescription, doc.suggestedResponses, doc.ownerId)
+                model._id = doc._id.toString()
+                model.templateType = "Review"
+                results.push(model)
+            }
+
+            if (doc.templateType === "Survey") {
+                let model = new SurveyTemplateModel(doc.questions)
+                model.id = doc._id.toString()
+                model.templateType = "Survey"
+                results.push(model)
+            }
+
         }
 
         await client.close()
@@ -105,7 +117,7 @@ export async function saveSurveyTemplate(survey){
 
         let collection = db.collection("Templates")
 
-        let surveyModel = new SurveyTemplateModel(survey.questions);
+        let surveyModel = new SurveyTemplateModel(survey.questions, "brandon");
         surveyModel.templateType = "Survey"
 
         await collection.insertOne(surveyModel);

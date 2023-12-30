@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {lastValueFrom} from "rxjs";
+import {SurveyTemplate, Question} from "../../../../shared/models/SurveyTemplate"
 
 @Component({
   selector: 'app-survey-builder',
@@ -30,7 +31,7 @@ export class SurveyBuilderComponent {
   }
 
   async saveTemplate() {
-    let survey:Survey = new Survey(this.questions)
+    let survey:SurveyTemplate = new SurveyTemplate(this.questions)
 
     // const surveyJson = JSON.stringify(survey);
 
@@ -51,21 +52,4 @@ export class SurveyBuilderComponent {
 }
 
 
-class Survey {
-  questions:Question[]
 
-
-  constructor(questions: Question[]) {
-    this.questions = questions;
-  }
-}
-
-class Question {
-  question: string
-  answers: string[]
-
-  constructor(question: string, answers: string[]) {
-    this.question = question;
-    this.answers = answers;
-  }
-}

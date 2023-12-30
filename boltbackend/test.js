@@ -60,18 +60,8 @@ app.get('/startConversation', function (req, res, next) {
     // remind the user about the item they purchased
     rbmApiHelper.sendMessage(params,
         function (response, err) {
-            // create a reference to send a picture of the image
-            // const productImageRequest = sendProductImage(msisdn);
-
             // create a reference to send a product rating prompt
             const productRatingRequest = sendProductRatingPrompt(msisdn, survey.questions[0]);
-
-            // send the user the product review messages
-            // productImageRequest.then((result) => {
-            //     productRatingRequest.then((ratingResult) => {
-            //         res.json({'result': 'ok'});
-            //     });
-            // });
         });
 
     db.saveSurvey(survey).then(res => console.log("Successfully saved survey"));
@@ -107,37 +97,6 @@ function sendProductRatingPrompt(msisdn, question) {
                     reject(response);
                 }
             });
-    });
-}
-
-/**
- * Sends the client an image of the product they purchased.
- * @param {string} msisdn The phone number in E.164 format.
- * @return {Promise} A promise for execution of the RBM api call.
- */
-function sendProductImage(msisdn) {
-    // URL to an image of the product that was purchased
-    const furnitureImageUrl = 'https://storage.googleapis.com/ggs-furniture-emporium.appspot.com/furniture_table.jpg';
-
-    const params = {
-        imageUrl: furnitureImageUrl,
-        msisdn: msisdn,
-    };
-
-    // send a rich card with an image of the product
-    return new Promise(function (resolve, reject) {
-        try {
-            rbmApiHelper.sendRichCard(params,
-                function (response) {
-                    if (response != null) {
-                        resolve();
-                    } else {
-                        reject(response);
-                    }
-                });
-        } catch (e) {
-            console.log(e);
-        }
     });
 }
 

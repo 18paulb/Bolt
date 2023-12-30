@@ -1,3 +1,4 @@
+<h1>Review Templates</h1>
 <div *ngFor="let template of reviewTemplates">
   <p>ImageUrl: {{template.imageUrl}}</p>
   <p>Message Text: {{template.messageText}}</p>
@@ -7,4 +8,19 @@
   </p>
   <button (click)="sendReviewTemplate(template)">send this template</button>
   <button (click)="deleteReviewTemplate(template)">delete this template</button>
+</div>
+
+<h1>Survey Templates</h1>
+<div *ngFor="let template of surveyTemplates">
+  <h2>Survey</h2>
+  <div *ngFor="let question of template.questions">
+    <h4>Question</h4>
+    <p>{{question.question}}</p>
+    <h4>Answers</h4>
+    <p *ngFor="let answer of question.answers">
+      {{answer}}
+    </p>
+  </div>
+  <button>send this template</button>
+  <button>delete this template</button>
 </div>
