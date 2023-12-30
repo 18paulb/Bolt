@@ -1,6 +1,7 @@
 import {MongoClient, ObjectId, ServerApiVersion} from "mongodb";
 import {ReviewTemplateModel} from "./models/ReviewTemplateModel.js";
 import {SurveyModel} from "./models/SurveyModel.js";
+import {SurveyTemplateModel} from "./models/SurveyTemplateModel.js";
 // import {ReviewTemplate} from "../../shared/models/ReviewTemplate.js";
 
 const uri = "mongodb+srv://brandonpaul:Sports18120@bolt.zjlyp8n.mongodb.net/?retryWrites=true&w=majority";
@@ -20,6 +21,7 @@ export async function saveReviewTemplate(template) {
         let db = client.db("Bolt");
 
         let reviewModel = new ReviewTemplateModel(template.imageUrl, template.messageText, template.messageDescription, template.suggestedResponses, "brandon")
+        reviewModel.templateType = "Review"
 
         await db.collection('Templates').insertOne(reviewModel);
 
@@ -67,7 +69,7 @@ export async function getAllTemplates(ownerId) {
         for (let i = 0; i < documents.length; ++i) {
             let doc = documents[i];
             let model = new ReviewTemplateModel(doc.imageUrl, doc.messageText, doc.messageDescription, doc.suggestedResponses, doc.ownerId)
-            model.objectId = doc._id.toString()
+            model._id = doc._id.toString()
             results.push(model)
         }
 
@@ -103,7 +105,10 @@ export async function saveSurveyTemplate(survey){
 
         let collection = db.collection("Templates")
 
-        await db.collection('Templates').insertOne(surveyModel);
+        let surveyModel = new SurveyTemplateModel(survey.questions);
+        surveyModel.templateType = "Survey"
+
+        await collection.insertOne(surveyModel);
 
         await client.close();
 

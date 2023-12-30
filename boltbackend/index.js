@@ -4,85 +4,104 @@ import * as db from './Database/db.js'
 import * as richCard from './Agents/richCard.js'
 import * as carousel from './Agents/carousel.js'
 import * as abandonedCart from './CRMApps/Shopify/ShopifyDataFetchers/AbandonedCartFetcher.js'
-// import {ReviewTemplate} from "../shared/models/ReviewTemplate.js";
 
 const app = express();
 const port = 3000;
 
 app.use(
-  cors({
-    origin: "http://localhost:4200", // Angular server
-  })
+    cors({
+        origin: "http://localhost:4200", // Angular server
+    })
 );
 // Middleware to parse the body of the request
 app.use(express.json());
 
+app.use((req, res, next) => {
+    console.log("Right here check for compatibility in the middleware")
+    next()
+})
+
 app.get("/", (req, res) => {
-  res.json({ message: "Hello World!" });
+    res.json({message: "Hello World!"});
 });
 
 app.post("/reviewTemplate", async (req, res) => {
-  try {
-    const data = req.body;
-    // let review = new ReviewTemplate(data.imageUrl, data.messageText, data.messageDescription, data.suggestedResponses)
+    try {
+        const data = req.body;
+        // let reviewTemplateModel = new ReviewTemplateModel(data.imageUrl, data.messageText, data.messageDescription, data.suggestedResponses, data.ownerId)
+        await db.saveReviewTemplate(data);
 
-    await db.saveReviewTemplate(data);
-
-    res.status(200);
-    res.json({ message: "Review Template Saved Successfully" });
-  } catch (error) {
-    console.error(error);
-    res.status(500);
-    res.json({ message: "An error occurred while saving the review template" });
-  }
+        res.status(200);
+        res.json({message: "Review Template Saved Successfully"});
+    } catch (error) {
+        console.error(error);
+        res.status(500);
+        res.json({message: "An error occurred while saving the review template"});
+    }
 });
 
-app.post('/surveyTemplate', async(req, res) => {
-    const data = req.body;
+app.post('/surveyTemplate', async (req, res) => {
 
-    await db.saveSurveyTemplate(data)
+    try {
+        const data = req.body;
+        await db.saveSurveyTemplate(data)
+        res.status(200);
+        res.json({message: "Success"})
+    } catch (error) {
+        console.log(error);
+        res.status(500);
+        res.json({message: "An error occured while saving the survey template"})
+    }
 })
 
 app.post('/sendAbandonedCart', async (req, res) => {
-
-    let cartData = abandonedCart.getAbandonedCarts()
-    await carousel.sendCarousel(cartData)
-        .then(response => {
-            res.status(200)
-            res.json({message: 'Abandoned Cart Sent'})
-        })
-        .catch(err => {
-            res.status(400)
-            res.json({message: err})
-        });
+    try {
+        let cartData = abandonedCart.getAbandonedCarts()
+        await carousel.sendCarousel(cartData)
+        res.status(200);
+        res.json({message: "Success"})
+    } catch (error) {
+        res.status(500)
+        res.json({message: "An error occurred while sending abandoned cart messages"})
+    }
 })
 
 app.post('/sendReviewTemplate', (req, res) => {
-    const data = req.body;
-    richCard.sendReviewTemplate(data)
+    try {
+        const data = req.body;
+        richCard.sendReviewTemplate(data)
+        res.status(200)
+        res.json({message: "Success"})
+    } catch (error) {
+        res.status(500)
+        res.json({message: "An error occurred while sending the review template"})
+    }
 })
 
 app.get("/getReviewTemplates/:userId", async (req, res) => {
-  const userId = req.params.userId;
-  let result = await db.getAllTemplates(userId);
-
-  res.status(200);
-  res.json(result);
+    try {
+        const userId = req.params.userId;
+        let result = await db.getAllTemplates(userId);
+        res.status(200);
+        res.json(result);
+    } catch (error) {
+        res.status(500);
+        res.json({message: "An error occurred while getting the review templates"})
+    }
 });
 
 app.delete("/deleteTemplate/:templateId", async (req, res) => {
-  const id = req.params.templateId;
-    await db.deleteTemplate(id)
-        .then(response => {
-            res.status(200)
-            res.json({message: 'Template Deleted Successfully'})
-        })
-        .catch(err => {
-            res.status(400)
-            res.json({message: err})
-        })
+    try {
+        const id = req.params.templateId;
+        await db.deleteTemplate(id)
+        res.status(200);
+        res.json({message: "Success"})
+    } catch (error) {
+        res.status(500);
+        res.json({message: "An error occurred while deleting the template"})
+    }
 })
 
 app.listen(port, () => {
-  console.log(`Server listening at http://localhost:${port}`);
+    console.log(`Server listening at http://localhost:${port}`);
 });
