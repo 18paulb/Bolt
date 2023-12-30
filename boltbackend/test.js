@@ -40,7 +40,6 @@ let survey = {
             response: null
         }
     ]
-
 }
 
 initPubsub();
@@ -48,8 +47,11 @@ initPubsub();
 /**
  * Sends the user information about the product they purchased.
  */
-app.get('/startConversation', function (req, res, next) {
-    const msisdn = req.query.phone_number;
+app.post('/startConversation', function (req, res, next) {
+    const msisdn = req.body.phoneNumber;
+    let surveyId = req.body.surveyId
+    let questions = req.body.questions
+
     const messageText = 'We are giving you a survey, please respond';
 
     const params = {
@@ -61,7 +63,8 @@ app.get('/startConversation', function (req, res, next) {
     rbmApiHelper.sendMessage(params,
         function (response, err) {
             // create a reference to send a product rating prompt
-            const productRatingRequest = sendProductRatingPrompt(msisdn, survey.questions[0]);
+            // const productRatingRequest = sendProductRatingPrompt(msisdn, survey.questions[0]);
+            const productRatingRequest = sendProductRatingPrompt(msisdn, questions[0])
         });
 
     db.saveSurvey(survey).then(res => console.log("Successfully saved survey"));

@@ -50,4 +50,21 @@ export class TemplateBrowserComponent implements OnInit {
     await lastValueFrom(this.http.delete("http://localhost:3000/deleteTemplate/" + template.objectId));
     this.getReviewTemplates().catch(console.dir)
   }
+
+  async sendSurveyTemplate(template: SurveyTemplate) {
+
+    let body: any = {
+      "phoneNumber": "+13853353799",
+      "questions": template.questions
+    }
+
+    // First save the survey in the database as a new sent survey
+    let res: any = await lastValueFrom(this.http.post("http://localhost:3000/saveSentSurvey", body))
+    debugger
+
+    body.surveyId = res.id
+
+    // This will be going to the 7777 port because that contains the code for the pubsub service
+    // await lastValueFrom(this.http.post("http://localhost:7777/startConversation/", body))
+  }
 }

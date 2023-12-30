@@ -78,6 +78,20 @@ app.post('/sendReviewTemplate', (req, res) => {
     }
 })
 
+app.post("/saveSentSurvey", async (req, res) => {
+    try {
+        const data = req.body;
+        // Save the survey into the db
+
+        let surveyId = await db.saveSurvey(data)
+
+        res.json({id: surveyId})
+    } catch (error) {
+        res.status(500)
+        res.json({message: "An error occurred while sending the survey"})
+    }
+})
+
 app.get("/getReviewTemplates/:userId", async (req, res) => {
     try {
         const userId = req.params.userId;
