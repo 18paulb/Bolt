@@ -16,103 +16,143 @@ const client = new MongoClient(uri, {
 });
 
 export async function saveReviewTemplate(template) {
-    try {
-        await client.connect();
-        let db = client.db("Bolt");
+    await client.connect();
+    let db = client.db("Bolt");
 
-        let reviewModel = new ReviewTemplateModel(template.imageUrl, template.messageText, template.messageDescription, template.suggestedResponses, "brandon")
-        reviewModel.templateType = "Review"
+    let reviewModel = new ReviewTemplateModel(template.imageUrl, template.messageText, template.messageDescription, template.suggestedResponses, "brandon")
+    reviewModel.templateType = "Review"
 
-        await db.collection('Templates').insertOne(reviewModel);
+    await db.collection('Templates').insertOne(reviewModel);
 
-        await client.close();
-    } catch (ex) {
-        console.log(ex);
-    }
+    await client.close();
 }
 
 export async function deleteTemplate(templateId) {
-    try {
-        await client.connect();
-        let db = client.db("Bolt");
-        let collection =  db.collection('Templates');
+    await client.connect();
+    let db = client.db("Bolt");
+    let collection = db.collection('Templates');
 
-        const objectId = new ObjectId(templateId); // Create an ObjectId from the id string
-        // Specify the filter criteria to delete by _id
-        const filter = { _id: objectId };
+    // Specify the filter criteria to delete by _id
+    const filter = {_id: new ObjectId(templateId)};
 
-        const result = await collection.deleteOne(filter);
+    const result = await collection.deleteOne(filter);
 
-        await client.close();
-    } catch (ex) {
-        console.log(ex);
-    }
+    await client.close();
 }
 
 export async function getAllTemplates(ownerId) {
+    await client.connect()
+    let db = client.db("Bolt")
+
+    // Define the filter criteria
+    const filter = {};
+    filter["ownerId"] = ownerId;
+
+    let collection = db.collection("Templates")
+
+    // Fetch documents matching the filter criteria
+    const documents = await collection.find(filter).toArray();
+
+    let results = []
+
+    // Get all results and make them into the shared ReviewTemplate model
+    for (let i = 0; i < documents.length; ++i) {
+        let doc = documents[i]
+
+        if (doc.templateType === "Review") {
+            let model = new ReviewTemplateModel(doc.imageUrl, doc.messageText, doc.messageDescription, doc.suggestedResponses, doc.ownerId)
+            model._id = doc._id.toString()
+            model.templateType = "Review"
+            results.push(model)
+        }
+
+        if (doc.templateType === "Survey") {
+            let model = new SurveyTemplateModel(doc.questions)
+            model.id = doc._id.toString()
+            model.templateType = "Survey"
+            results.push(model)
+        }
+
+    }
+
+    await client.close()
+
+    return results;
+}
+
+export async function saveSurvey(survey) {
+    await client.connect()
+    let db = client.db("Bolt")
+    let surveyModel = new SurveyModel(survey.phoneNumber, survey.questions)
+
+    // Add extra data to the survey, ie hasAnswered/response fields
+    for (let i = 0; i < surveyModel.questions.length; ++i) {
+        let question = surveyModel.questions[i]
+
+        question.hasAnswered = false;
+        question.response = null;
+    }
+
+    let insertResult = await db.collection('Survey').insertOne(surveyModel);
+
+    await client.close();
+
+    // Returns the ID of the survey so that we can update it later
+    return insertResult.insertedId.toString()
+}
+
+export async function updateSurvey(survey, surveyId) {
     try {
         await client.connect()
         let db = client.db("Bolt")
 
-        // Define the filter criteria
-        const filter = {};
-        filter["ownerId"] = ownerId;
+        const result = await db.collection('Surveys').updateOne(
+            { _id: new ObjectId(surveyId) }, // Filter criteria: match documents with this surveyId
+            { $set: survey }   // Update operation: set the new values from `survey`
+        );
 
-        let collection = db.collection("Templates")
-
-        // Fetch documents matching the filter criteria
-        const documents = await collection.find(filter).toArray();
-
-        let results = []
-
-        // Get all results and make them into the shared ReviewTemplate model
-        for (let i = 0; i < documents.length; ++i) {
-            let doc = documents[i];
-            let model = new ReviewTemplateModel(doc.imageUrl, doc.messageText, doc.messageDescription, doc.suggestedResponses, doc.ownerId)
-            model._id = doc._id.toString()
-            results.push(model)
+        // `result` contains information about the operation
+        // For example, you can check if a document was modified:
+        if (result.modifiedCount === 0) {
+            console.log('No document was updated.');
+        } else {
+            console.log('Document updated successfully.');
         }
 
         await client.close()
 
-        return results;
-
-    } catch (ex) {
-        console.log(ex)
+        return result;
+    } catch (error) {
+        console.error('Error updating the survey:', error);
+        throw error; // Rethrow the error for further handling if necessary
     }
 }
 
-export async function saveSurvey(survey){
-    try {
-        await client.connect()
-        let db = client.db("Bolt")
+export async function getSurvey(surveyId) {
+    await client.connect()
+    let db = client.db("Bolt")
 
-        let surveyModel = new SurveyModel(survey.phoneNumber, survey.questions)
+    const filter = { _id: new ObjectId(surveyId) }
 
-        await db.collection('Survey').insertOne(surveyModel);
+    let collection = db.collection("Surveys")
 
-        await client.close();
+    const documents = await collection.find(filter).toArray();
 
-    } catch (ex) {
-        console.log(ex)
-    }
+    await client.close()
+
+    return documents[0]
 }
 
-export async function saveSurveyTemplate(survey){
-    try {
-        await client.connect()
-        let db = client.db("Bolt")
+export async function saveSurveyTemplate(survey) {
+    await client.connect()
+    let db = client.db("Bolt")
 
-        let collection = db.collection("Templates")
+    let collection = db.collection("Templates")
 
-        let surveyModel = new SurveyTemplateModel(survey.questions);
-        surveyModel.templateType = "Survey"
+    let surveyModel = new SurveyTemplateModel(survey.questions, "brandon");
+    surveyModel.templateType = "Survey"
 
-        await collection.insertOne(surveyModel);
+    await collection.insertOne(surveyModel);
 
-        await client.close();
-
-    } catch (ex) {
-        console.log(ex)
-    }
+    await client.close();
 }
