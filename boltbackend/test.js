@@ -5,6 +5,7 @@ import * as db from './Database/db.js'
 
 import rbmPrivatekey from './Agents/rbm-credentials.json' assert {type: 'json'};
 import rbmApiHelper from '@google/rcsbusinessmessaging'
+import cors from "cors";
 
 const app = express();
 const port = 7777;
@@ -12,11 +13,6 @@ const port = 7777;
 // the name of the Pub/Sub pull subscription,
 // replace with your subscription name
 const subscriptionName = 'projects/rbm-test-vgw4szq/subscriptions/rbm-agent-subscription';
-
-rbmApiHelper.initRbmApi(rbmPrivatekey);
-
-// initialize Pub/Sub for pull subscription listener
-// this is how this agent will receive messages from the client
 
 let survey = {
     phoneNumber: '+13853353799',
@@ -42,17 +38,28 @@ let survey = {
     ]
 }
 
+app.use(
+    cors({
+        origin: "http://localhost:4200", // Angular server
+    })
+);
+
+// initialize Pub/Sub for pull subscription listener
+// this is how this agent will receive messages from the client
+rbmApiHelper.initRbmApi(rbmPrivatekey);
 initPubsub();
 
 /**
  * Sends the user information about the product they purchased.
  */
-app.post('/startConversation', function (req, res, next) {
+app.post('/startConversation', async function (req, res, next) {
     const msisdn = req.body.phoneNumber;
     let surveyId = req.body.surveyId
-    let questions = req.body.questions
+    // let questions = req.body.questions
 
     const messageText = 'We are giving you a survey, please respond';
+
+    // survey = await db.getSurvey(surveyId)
 
     const params = {
         messageText: messageText,
@@ -60,14 +67,13 @@ app.post('/startConversation', function (req, res, next) {
     };
 
     // remind the user about the item they purchased
-    rbmApiHelper.sendMessage(params,
+    await rbmApiHelper.sendMessage(params,
         function (response, err) {
             // create a reference to send a product rating prompt
             // const productRatingRequest = sendProductRatingPrompt(msisdn, survey.questions[0]);
-            const productRatingRequest = sendProductRatingPrompt(msisdn, questions[0])
-        });
+            const productRatingRequest = sendProductRatingPrompt(msisdn, survey.questions[0])
+    });
 
-    db.saveSurvey(survey).then(res => console.log("Successfully saved survey"));
     return res.json({'message': "hooray"})
 });
 
@@ -143,6 +149,8 @@ function handleMessage(userEvent) {
                     }
                 }
             }
+
+            db.updateSurvey(survey, survey._id.toString())
         }
     }
 }
@@ -169,7 +177,6 @@ function getMessageBody(userEvent) {
  * to receive messages from Pub/Sub.
  */
 function initPubsub() {
-    console.log('initPubsub');
 
     const pubsub = new PubSub({
         projectId: rbmPrivatekey.project_id,

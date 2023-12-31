@@ -43,7 +43,7 @@ export class TemplateBrowserComponent implements OnInit {
   }
 
   async sendReviewTemplate(template: ReviewTemplate) {
-    await lastValueFrom(this.http.post("http://localhost:3000/sendReviewTemplate", template))
+    await lastValueFrom(this.http.post("http://localhost:3000/sendReviewTemplate/", template))
   }
 
   async deleteReviewTemplate(template: ReviewTemplate) {
@@ -59,12 +59,14 @@ export class TemplateBrowserComponent implements OnInit {
     }
 
     // First save the survey in the database as a new sent survey
-    let res: any = await lastValueFrom(this.http.post("http://localhost:3000/saveSentSurvey", body))
-    debugger
+    let res: any = await lastValueFrom(this.http.post("http://localhost:3000/saveSentSurvey/", body))
 
-    body.surveyId = res.id
+    body = {
+      "msisdn": "+13853353799",
+      "surveyId": res.id
+    }
 
     // This will be going to the 7777 port because that contains the code for the pubsub service
-    // await lastValueFrom(this.http.post("http://localhost:7777/startConversation/", body))
+    await lastValueFrom(this.http.post("http://localhost:7777/startConversation/", body))
   }
 }
