@@ -1,5 +1,4 @@
 import express from 'express';
-// const {PubSub} = require('@google-cloud/pubsub');
 import {PubSub} from '@google-cloud/pubsub';
 import * as db from './Database/db.js'
 
@@ -13,41 +12,18 @@ const port = 7777;
 // the name of the Pub/Sub pull subscription,
 // replace with your subscription name
 const subscriptionName = 'projects/rbm-test-vgw4szq/subscriptions/rbm-agent-subscription';
-
-let survey = {
-    phoneNumber: '+13853353799',
-    questions: [
-        {
-            question: "Do you like cats?",
-            answers: ["yes", "no"],
-            hasResponded: false,
-            response: null
-        },
-        {
-            question: "Do you like dogs?",
-            answers: ["yes", "no"],
-            hasResponded: false,
-            response: null
-        },
-        {
-            question: "Do you like me?",
-            answers: ["yes", "no"],
-            hasResponded: false,
-            response: null
-        }
-    ]
-}
+// initialize Pub/Sub for pull subscription listener
+// this is how this agent will receive messages from the client
+rbmApiHelper.initRbmApi(rbmPrivatekey);
+initPubsub();
 
 app.use(
     cors({
         origin: "http://localhost:4200", // Angular server
     })
 );
+app.use(express.json());
 
-// initialize Pub/Sub for pull subscription listener
-// this is how this agent will receive messages from the client
-rbmApiHelper.initRbmApi(rbmPrivatekey);
-initPubsub();
 
 /**
  * Sends the user information about the product they purchased.
@@ -57,9 +33,9 @@ app.post('/startConversation', async function (req, res, next) {
     let surveyId = req.body.surveyId
     // let questions = req.body.questions
 
-    const messageText = 'We are giving you a survey, please respond';
+    const messageText = 'Thanks for agreeing to participate in a survey, to opt out, please respond STOP';
 
-    // survey = await db.getSurvey(surveyId)
+    let survey = await db.getSurvey(surveyId)
 
     const params = {
         messageText: messageText,
@@ -67,6 +43,8 @@ app.post('/startConversation', async function (req, res, next) {
     };
 
     // remind the user about the item they purchased
+    // 1. First this sends a message via params
+    // 2. The callback function is then called (the 2nd parameter) after sendMessage is complete
     await rbmApiHelper.sendMessage(params,
         function (response, err) {
             // create a reference to send a product rating prompt
@@ -115,10 +93,11 @@ function sendProductRatingPrompt(msisdn, question) {
  * @param {object} userEvent The JSON object of a message
  * received by the pull subscription.
  */
-function handleMessage(userEvent) {
-    if (userEvent.senderPhoneNumber != undefined) {
-        // get the sender's phone number
-        const msisdn = userEvent.senderPhoneNumber;
+async function handleMessage(userEvent) {
+    // get the sender's phone number
+    const msisdn = userEvent.senderPhoneNumber
+
+    if (msisdn !== undefined) {
 
         // parse the response text
         const message = getMessageBody(userEvent);
@@ -128,10 +107,13 @@ function handleMessage(userEvent) {
 
         // check to see that we have a message to process
         if (message) {
+
+            let survey = await db.getSurveyByPhoneNumber(msisdn)
+
             // send a read receipt
             rbmApiHelper.sendReadMessage(msisdn, messageId);
 
-            // Save to the question
+            // Save the answer to the question
             for (let i = 0; i < survey.questions.length; ++i) {
                 if (!survey.questions[i].hasResponded) {
                     survey.questions[i].hasResponded = true;
@@ -140,6 +122,10 @@ function handleMessage(userEvent) {
                 }
             }
 
+            // Update the survey in the database to have the most recent answer
+            db.updateSurvey(survey, survey._id.toString()).catch(console.dir)
+
+            // Go to the next question in the survey and send that
             if (msisdn === survey.phoneNumber) {
                 for (let i = 0; i < survey.questions.length; ++i) {
                     console.log(survey.questions[i]);
@@ -149,8 +135,6 @@ function handleMessage(userEvent) {
                     }
                 }
             }
-
-            db.updateSurvey(survey, survey._id.toString())
         }
     }
 }
@@ -194,7 +178,7 @@ function initPubsub() {
 
         const userEvent = JSON.parse(message.data);
 
-        handleMessage(userEvent);
+        handleMessage(userEvent).catch(console.dir);
 
         // "Ack" (acknowledge receipt of) the message
         message.ack();
@@ -208,5 +192,5 @@ function initPubsub() {
 
 
 app.listen(port, () => {
-    console.log("listening on port")
+    console.log("listening on port " + port)
 })

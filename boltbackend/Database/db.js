@@ -83,12 +83,11 @@ export async function getAllTemplates(ownerId) {
 export async function saveSurvey(survey) {
     await client.connect()
     let db = client.db("Bolt")
-    let surveyModel = new SurveyModel(survey.phoneNumber, survey.questions)
+    let surveyModel = new SurveyModel(survey.phoneNumber, survey.questions, Date.now())
 
     // Add extra data to the survey, ie hasAnswered/response fields
     for (let i = 0; i < surveyModel.questions.length; ++i) {
         let question = surveyModel.questions[i]
-
         question.hasAnswered = false;
         question.response = null;
     }
@@ -106,7 +105,7 @@ export async function updateSurvey(survey, surveyId) {
         await client.connect()
         let db = client.db("Bolt")
 
-        const result = await db.collection('Surveys').updateOne(
+        const result = await db.collection('Survey').updateOne(
             { _id: new ObjectId(surveyId) }, // Filter criteria: match documents with this surveyId
             { $set: survey }   // Update operation: set the new values from `survey`
         );
@@ -134,13 +133,34 @@ export async function getSurvey(surveyId) {
 
     const filter = { _id: new ObjectId(surveyId) }
 
-    let collection = db.collection("Surveys")
+    let collection = db.collection("Survey")
 
     const documents = await collection.find(filter).toArray();
 
     await client.close()
 
     return documents[0]
+}
+
+export async function getSurveyByPhoneNumber(phoneNumber) {
+    await client.connect()
+    let db = client.db("Bolt")
+
+    const filter = { phoneNumber: phoneNumber}
+
+    let collection = db.collection("Survey")
+
+    // FIXME: This is not a long term solution for making sure the correct survey is fetched
+    // This should get the latest survey sent to a phone number
+    const latestDocument = await collection.find(filter)
+        .sort({ date: -1 })
+        .limit(1)
+        .toArray();
+
+    await client.close()
+
+    return latestDocument.length > 0 ? latestDocument[0] : null;
+
 }
 
 export async function saveSurveyTemplate(survey) {

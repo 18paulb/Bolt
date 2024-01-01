@@ -58,11 +58,13 @@ export class TemplateBrowserComponent implements OnInit {
       "questions": template.questions
     }
 
+    debugger
+
     // First save the survey in the database as a new sent survey
     let res: any = await lastValueFrom(this.http.post("http://localhost:3000/saveSentSurvey/", body))
 
     body = {
-      "msisdn": "+13853353799",
+      "phoneNumber": "+13853353799",
       "surveyId": res.id
     }
 
