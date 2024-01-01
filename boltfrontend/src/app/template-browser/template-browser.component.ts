@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {lastValueFrom} from "rxjs";
+import {last, lastValueFrom} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {ReviewTemplate} from "../../../../shared/models/ReviewTemplate";
 import {SurveyTemplate} from "../../../../shared/models/SurveyTemplate";
@@ -43,7 +43,20 @@ export class TemplateBrowserComponent implements OnInit {
   }
 
   async sendReviewTemplate(template: ReviewTemplate) {
-    await lastValueFrom(this.http.post("http://localhost:3000/sendReviewTemplate/", template))
+
+    let body: any = {
+      "phoneNumber": "+13853353799",
+      "review": template
+    }
+
+    let res: any = await lastValueFrom(this.http.post("http://localhost:3000/saveSentReview", body))
+
+    body = {
+      "phoneNumber": "+13853353799",
+      "reviewId": res.id
+    }
+
+    await lastValueFrom(this.http.post("http://localhost:7777/startReview/", body))
   }
 
   async deleteReviewTemplate(template: ReviewTemplate) {
@@ -58,8 +71,6 @@ export class TemplateBrowserComponent implements OnInit {
       "questions": template.questions
     }
 
-    debugger
-
     // First save the survey in the database as a new sent survey
     let res: any = await lastValueFrom(this.http.post("http://localhost:3000/saveSentSurvey/", body))
 
@@ -69,6 +80,6 @@ export class TemplateBrowserComponent implements OnInit {
     }
 
     // This will be going to the 7777 port because that contains the code for the pubsub service
-    await lastValueFrom(this.http.post("http://localhost:7777/startConversation/", body))
+    await lastValueFrom(this.http.post("http://localhost:7777/startSurvey/", body))
   }
 }

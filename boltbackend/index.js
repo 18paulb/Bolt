@@ -66,12 +66,11 @@ app.post('/sendAbandonedCart', async (req, res) => {
     }
 })
 
-app.post('/sendReviewTemplate', (req, res) => {
+app.post("/saveSentReview", async (req, res) => {
     try {
-        const data = req.body;
-        richCard.sendReviewTemplate(data)
+        let reviewId = await db.saveSentReview(req.body.review, req.body.phoneNumber)
         res.status(200)
-        res.json({message: "Success"})
+        res.json({id: reviewId})
     } catch (error) {
         res.status(500)
         res.json({message: "An error occurred while sending the review template"})
@@ -81,10 +80,10 @@ app.post('/sendReviewTemplate', (req, res) => {
 app.post("/saveSentSurvey", async (req, res) => {
     try {
         const data = req.body;
-        // Save the survey into the db
 
-        let surveyId = await db.saveSurvey(data)
+        let surveyId = await db.saveSentSurvey(data)
 
+        res.status(200)
         res.json({id: surveyId})
     } catch (error) {
         res.status(500)
