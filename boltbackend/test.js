@@ -93,6 +93,9 @@ function sendProductRatingPrompt(msisdn, question) {
  * @param {object} userEvent The JSON object of a message
  * received by the pull subscription.
  */
+
+//TODO: This needs to be able to account for different message types (ie Survey vs Review)
+
 async function handleMessage(userEvent) {
     // get the sender's phone number
     const msisdn = userEvent.senderPhoneNumber
@@ -126,14 +129,27 @@ async function handleMessage(userEvent) {
             db.updateSurvey(survey, survey._id.toString()).catch(console.dir)
 
             // Go to the next question in the survey and send that
+            let allQuestionsAnswered = true;
             if (msisdn === survey.phoneNumber) {
                 for (let i = 0; i < survey.questions.length; ++i) {
                     console.log(survey.questions[i]);
                     if (!survey.questions[i].hasResponded) {
+                        allQuestionsAnswered = false;
                         sendProductRatingPrompt(msisdn, survey.questions[i]).then(r => console.log(r))
                         break;
                     }
                 }
+            }
+
+            if (allQuestionsAnswered) {
+                const params = {
+                    messageText: "Thank you for completing the survey!",
+                    msisdn: msisdn,
+                };
+                await rbmApiHelper.sendMessage(params,
+                    function (response, err) {
+                        console.log("Survey is done")
+                    });
             }
         }
     }
