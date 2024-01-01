@@ -23,7 +23,7 @@ import privateKey from './rbm-credentials.json' assert { type: 'json' };
 rbmApiHelper.initRbmApi(privateKey);
 rbmApiHelper.setAgentId(config.agentId);
 
-export function sendReviewTemplate(reviewTemplate) {
+export function sendReviewTemplate(reviewTemplate, phoneNumber) {
 
     let suggestions = []
 
@@ -31,7 +31,7 @@ export function sendReviewTemplate(reviewTemplate) {
         suggestions.push(        {
             reply: {
                 'text': reviewTemplate["suggestedResponses"][i],
-                'postbackData': 'suggestion'+i
+                'postbackData': 'REVIEW_ANSWER_'+i
             },
         })
     }
@@ -39,7 +39,7 @@ export function sendReviewTemplate(reviewTemplate) {
     const params = {
         messageText: reviewTemplate["messageText"],
         messageDescription: reviewTemplate["messageDescription"],
-        msisdn: config.phoneNumber,
+            msisdn: phoneNumber,
         suggestions: suggestions,
         imageUrl: reviewTemplate["imageUrl"],
         height: 'MEDIUM'

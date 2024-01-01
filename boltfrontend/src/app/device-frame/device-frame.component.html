@@ -1,9 +1,19 @@
 <div style="position: relative;">
-    <img src="/assets/device-frame.png" style="width: 300px; height: auto;">
-    <div style="position: absolute; top: 90px; left: 50px; background-color: white; padding: 10px;">
-        <p>Text bubble 1</p>
+  <img src="/assets/device-frame.png" style="width: 300px; height: auto;">
+
+  <!-- Scrollable container -->
+  <div style="display: flex; flex-direction: column; position: absolute; top: 100px; left: 40px; width: 215px; height: 200px; overflow: auto;">
+
+    <!-- Text bubble 1: Left aligned -->
+    <div style="background-color: white; padding: 10px; width: 50%; left: 0;">
+      <p>Text bubble 1</p>
     </div>
-    <div style="position: absolute; top: 190px; left: 150px; background-color: white; padding: 10px;">
-        <p>Text bubble 2</p>
+
+    <!-- Text bubble 2: Right aligned -->
+    <div style="background-color: white; padding: 10px; margin-top: 10px; width: 50%; right: 0;">
+      <p>Text bubble 2</p>
     </div>
+
+    <!-- More text bubbles can be added here -->
+  </div>
 </div>
