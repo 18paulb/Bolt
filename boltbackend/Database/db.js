@@ -88,7 +88,7 @@ export async function saveSurvey(survey) {
     // Add extra data to the survey, ie hasAnswered/response fields
     for (let i = 0; i < surveyModel.questions.length; ++i) {
         let question = surveyModel.questions[i]
-        question.hasAnswered = false;
+        question.hasResponded = false;
         question.response = null;
     }
 
