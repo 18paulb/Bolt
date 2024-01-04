@@ -27,33 +27,40 @@ app.use(express.json());
 
 
 /**
- * Sends the user information about the product they purchased.
+ * Sends a survey to the user, expected to have suggested responses
  */
 app.post('/startSurvey', async function (req, res, next) {
-    const msisdn = req.body.phoneNumber;
-    let surveyId = req.body.surveyId
+    try {
+        const msisdn = req.body.phoneNumber;
+        let surveyId = req.body.surveyId
 
-    const messageText = 'Thanks for agreeing to participate in a survey, to opt out, please respond STOP';
+        const messageText = 'Thanks for agreeing to participate in this survey, to opt out, please respond STOP';
 
-    let survey = await db.getSurvey(surveyId)
+        let survey = await db.getSurvey(surveyId)
 
-    const params = {
-        messageText: messageText,
-        msisdn: msisdn,
-    };
+        const params = {
+            messageText: messageText,
+            msisdn: msisdn,
+        };
 
-    // 1. First this sends a message via params
-    // 2. The callback function is then called (the 2nd parameter) after sendMessage is complete
-    await rbmApiHelper.sendMessage(params,
-        function (response, err) {
-            // create a reference to send a product rating prompt
-            // const productRatingRequest = sendSurveyQuestion(msisdn, survey.questions[0]);
-            const productRatingRequest = sendSurveyQuestion(msisdn, survey.questions[0])
-        });
+        // 1. First this sends a message via params
+        // 2. The callback function is then called (the 2nd parameter) after sendMessage is complete
+        await rbmApiHelper.sendMessage(params,
+            function (response, err) {
+                sendSurveyQuestion(msisdn, survey.questions[0])
+            });
 
-    return res.json({message: "hooray"})
+        res.status(200)
+        return res.json({message: "hooray"})
+    } catch (error) {
+        res.status(500)
+        res.json({message: "An error has occurred"})
+    }
 });
 
+/**
+ * Sends a review to phone numbers (expects a review to have suggested responses, see ReviewTemplate.ts)
+ */
 app.post('/startReview', async (req, res)=>  {
     const reviewId = req.body.reviewId;
     const msisdn = req.body.phoneNumber
@@ -66,7 +73,12 @@ app.post('/startReview', async (req, res)=>  {
     return res.json({message: "hooray"})
 });
 
-
+/**
+ * Parses a survey question and sends it as an RCS message
+ * @param msisdn - The phone number to send to
+ * @param question - The question to send (see SurveyTemplate.ts)
+ * @returns {Promise<unknown>}
+ */
 function sendSurveyQuestion(msisdn, question) {
     let suggestions = [];
     for (let i = 0; i < question.answers.length; ++i) {
@@ -99,7 +111,12 @@ function sendSurveyQuestion(msisdn, question) {
     });
 }
 
-
+/**
+ * Handles a message response to a survey
+ * @param msisdn - the phone number that sent the response
+ * @param message - the message text the phone number sent
+ * @returns {Promise<void>}
+ */
 async function handleSurveyMessage(msisdn, message) {
     let survey = await db.getSurveyByPhoneNumber(msisdn)
 
@@ -140,6 +157,12 @@ async function handleSurveyMessage(msisdn, message) {
     }
 }
 
+/**
+ * Handles a message response to a review
+ * @param msisdn - The phone number that is responding
+ * @param message - The response that is received
+ * @returns {Promise<void>}
+ */
 async function handleReviewMessage(msisdn, message){
     let review = await db.getReviewByPhoneNumber(msisdn, message)
 
@@ -152,10 +175,9 @@ async function handleReviewMessage(msisdn, message){
 /**
  * Uses the event received by the pull subscription to send a
  * response to the client's device.
- * @param {object} userEvent The JSON object of a message
- * received by the pull subscription.
+ * @param {object} userEvent The JSON object of a message received by the pull subscription.
+ * Depending on the postbackData of the response, different logic will be applied (ie handle survey vs review response
  */
-
 async function handleMessage(userEvent) {
     // get the sender's phone number
     const msisdn = userEvent.senderPhoneNumber
@@ -171,13 +193,7 @@ async function handleMessage(userEvent) {
         // check to see that we have a message to process
         if (message) {
 
-            /*
-            The following if statements control the logic that is performed depending on the type messages the user is responding to
-            (ie to a survey or to a review message)
-            We place info in the message postback data that tells what kind of message it is
-            FIXME: However if there is no message postback data to suggested responses this won't work
-             */
-
+            //FIXME: If there is no message postback data to suggested responses this won't work (ie a free response)
             if (userEvent.suggestionResponse.postbackData.includes("SURVEY")) {
                 await handleSurveyMessage(msisdn, message)
             }
