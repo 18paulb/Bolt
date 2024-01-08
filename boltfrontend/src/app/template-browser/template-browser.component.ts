@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {last, lastValueFrom} from "rxjs";
+import {lastValueFrom} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 import {ReviewTemplate} from "../../../../shared/models/ReviewTemplate";
 import {SurveyTemplate} from "../../../../shared/models/SurveyTemplate";
@@ -44,8 +44,10 @@ export class TemplateBrowserComponent implements OnInit {
 
   async sendReviewTemplate(template: ReviewTemplate) {
 
+    let compatiblePhoneNumbers = await this.checkCompatibility(this.phoneNumbers);
+
     let body: any = {
-      "phoneNumbers": this.phoneNumbers,
+      "phoneNumbers": compatiblePhoneNumbers,
       "review": template
     }
 
@@ -62,8 +64,10 @@ export class TemplateBrowserComponent implements OnInit {
 
   async sendSurveyTemplate(template: SurveyTemplate) {
 
+    let compatiblePhoneNumbers = await this.checkCompatibility(this.phoneNumbers);
+
     let body: any = {
-      "phoneNumbers": this.phoneNumbers,
+      "phoneNumbers": compatiblePhoneNumbers,
       "questions": template.questions
     }
 
@@ -71,5 +75,15 @@ export class TemplateBrowserComponent implements OnInit {
     let res: any = await lastValueFrom(this.http.post("http://localhost:3000/saveSentSurvey/", body))
 
     await lastValueFrom(this.http.post("http://localhost:7777/startSurvey/", res))
+  }
+
+  async checkCompatibility(phoneNumbers: string[]) {
+    let body: any = {
+      "phoneNumbers": phoneNumbers
+    }
+
+    let res:any = await lastValueFrom(this.http.post("http://localhost:3000/compatibilityCheck/", body))
+
+    return res.phoneNumbers;
   }
 }

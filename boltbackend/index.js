@@ -3,6 +3,8 @@ import cors from 'cors'
 import * as db from './Database/db.js'
 import * as carousel from './Agents/carousel.js'
 import * as abandonedCart from './CRMApps/Shopify/ShopifyDataFetchers/AbandonedCartFetcher.js'
+import * as compatibility from './Agents/compatibilityCheck.js'
+import {checkBulkCompatibility} from "./Agents/compatibilityCheck.js";
 
 const app = express();
 const port = 3000;
@@ -23,6 +25,20 @@ app.use((req, res, next) => {
 app.get("/", (req, res) => {
     res.json({message: "Hello World!"});
 });
+
+
+app.post("/compatibilityCheck", async (req, res) => {
+    try {
+        let phoneNumbers = req.body.phoneNumbers;
+
+        let compatiblePhoneNumbers = await compatibility.checkBulkCompatibility(phoneNumbers)
+
+        res.status(200).json({phoneNumbers: compatiblePhoneNumbers})
+
+    } catch (error) {
+        res.status(500).json({message: "An error occurred"})
+    }
+})
 
 app.post("/reviewTemplate", async (req, res) => {
     try {
