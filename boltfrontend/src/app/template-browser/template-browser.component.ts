@@ -20,6 +20,7 @@ export class TemplateBrowserComponent implements OnInit {
 
   reviewTemplates: ReviewTemplate[] = []
   surveyTemplates: SurveyTemplate[] = []
+  phoneNumbers: string[] = ["+13853353799"]
 
   async getReviewTemplates() {
 
@@ -36,7 +37,6 @@ export class TemplateBrowserComponent implements OnInit {
       }
 
       if (result.templateType === "Survey") {
-        debugger
         this.surveyTemplates.push(new SurveyTemplate(result["questions"]))
       }
     }
@@ -45,18 +45,14 @@ export class TemplateBrowserComponent implements OnInit {
   async sendReviewTemplate(template: ReviewTemplate) {
 
     let body: any = {
-      "phoneNumber": "+13853353799",
+      "phoneNumbers": this.phoneNumbers,
       "review": template
     }
 
     let res: any = await lastValueFrom(this.http.post("http://localhost:3000/saveSentReview", body))
 
-    body = {
-      "phoneNumber": "+13853353799",
-      "reviewId": res.id
-    }
-
-    await lastValueFrom(this.http.post("http://localhost:7777/startReview/", body))
+    // res contains the key/value pairs of phoneNumbers to reviewIds that we send to the startReviewEndpoint
+    await lastValueFrom(this.http.post("http://localhost:7777/startReview/", res))
   }
 
   async deleteReviewTemplate(template: ReviewTemplate) {
@@ -67,19 +63,13 @@ export class TemplateBrowserComponent implements OnInit {
   async sendSurveyTemplate(template: SurveyTemplate) {
 
     let body: any = {
-      "phoneNumber": "+13853353799",
+      "phoneNumbers": this.phoneNumbers,
       "questions": template.questions
     }
 
     // First save the survey in the database as a new sent survey
     let res: any = await lastValueFrom(this.http.post("http://localhost:3000/saveSentSurvey/", body))
 
-    body = {
-      "phoneNumber": "+13853353799",
-      "surveyId": res.id
-    }
-
-    // This will be going to the 7777 port because that contains the code for the pubsub service
-    await lastValueFrom(this.http.post("http://localhost:7777/startSurvey/", body))
+    await lastValueFrom(this.http.post("http://localhost:7777/startSurvey/", res))
   }
 }

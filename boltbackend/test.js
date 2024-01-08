@@ -31,46 +31,51 @@ app.use(express.json());
  */
 app.post('/startSurvey', async function (req, res, next) {
     try {
-        const msisdn = req.body.phoneNumber;
-        let surveyId = req.body.surveyId
+
+        let surveyIdMap = req.body
 
         const messageText = 'Thanks for agreeing to participate in this survey, to opt out, please respond STOP';
 
-        let survey = await db.getSurvey(surveyId)
+        for (const [phoneNumber, surveyId] of Object.entries(surveyIdMap)) {
+            let survey = await db.getSurvey(surveyId)
 
-        const params = {
-            messageText: messageText,
-            msisdn: msisdn,
-        };
+            const params = {
+                messageText: messageText,
+                msisdn: phoneNumber,
+            };
 
-        // 1. First this sends a message via params
-        // 2. The callback function is then called (the 2nd parameter) after sendMessage is complete
-        await rbmApiHelper.sendMessage(params,
-            function (response, err) {
-                sendSurveyQuestion(msisdn, survey.questions[0])
-            });
+            // 1. First this sends a message via params
+            // 2. The callback function is then called (the 2nd parameter) after sendMessage is complete
+            await rbmApiHelper.sendMessage(params,
+                function (response, err) {
+                    sendSurveyQuestion(phoneNumber, survey.questions[0])
+                });
+        }
 
-        res.status(200)
-        return res.json({message: "hooray"})
+        res.status(200).json({message: "hooray"})
     } catch (error) {
-        res.status(500)
-        res.json({message: "An error has occurred"})
+        res.status(500).json({message: "An error has occurred"})
     }
 });
 
 /**
  * Sends a review to phone numbers (expects a review to have suggested responses, see ReviewTemplate.ts)
  */
-app.post('/startReview', async (req, res)=>  {
-    const reviewId = req.body.reviewId;
-    const msisdn = req.body.phoneNumber
+app.post('/startReview', async (req, res) => {
 
-    let review = await db.getReview(reviewId)
+    try {
+        let reviewIdMap = req.body
 
-    richCard.sendReviewTemplate(review, msisdn)
+        // Value is the reviewId, key is the phoneNumber
+        for (const [phoneNumber, reviewId] of Object.entries(reviewIdMap)) {
+            let review = await db.getReview(reviewId);
+            richCard.sendReviewTemplate(review, phoneNumber);
+        }
 
-    res.status(200)
-    return res.json({message: "hooray"})
+        res.status(200).json({message: "hooray"})
+    } catch (ex) {
+        res.status(500).json({message: "An error has occurred"});
+    }
 });
 
 /**
@@ -163,7 +168,7 @@ async function handleSurveyMessage(msisdn, message) {
  * @param message - The response that is received
  * @returns {Promise<void>}
  */
-async function handleReviewMessage(msisdn, message){
+async function handleReviewMessage(msisdn, message) {
     let review = await db.getReviewByPhoneNumber(msisdn, message)
 
     review.hasResponded = true
@@ -194,12 +199,16 @@ async function handleMessage(userEvent) {
         if (message) {
 
             //FIXME: If there is no message postback data to suggested responses this won't work (ie a free response)
+            // Ideas for how to fix this:
+            // 1. We could make it so that any text after a question goes to the answer of that question (but then if they make a mistake text that would screw things up as we would only take the immediate next text)
             if (userEvent.suggestionResponse.postbackData.includes("SURVEY")) {
                 await handleSurveyMessage(msisdn, message)
-            }
-
-            if (userEvent.suggestionResponse.postbackData.includes("REVIEW")) {
+            } else if (userEvent.suggestionResponse.postbackData.includes("REVIEW")) {
                 await handleReviewMessage(msisdn, message)
+            }
+            // This means that they do not do a suggested response, so either it is open-ended question or they did not answer correctly
+            else if (userEvent.suggestionResponse == null) {
+
             }
         }
     }
