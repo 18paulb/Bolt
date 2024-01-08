@@ -52,7 +52,7 @@ export async function getAllTemplates(ownerId) {
 
     // Define the filter criteria
     const filter = {};
-    filter["ownerId"] = ownerId;
+    filter.ownerId = ownerId;
 
     let collection = db.collection("Templates")
 
