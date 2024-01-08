@@ -1,9 +1,11 @@
-export class SurveyTemplate {
+import {Template} from "./Template";
+
+export class SurveyTemplate extends Template {
     questions:Question[]
 
 
-
-    constructor(questions: Question[]) {
+    constructor(questions: Question[], objectId:string) {
+        super(objectId)
         this.questions = questions;
     }
 }

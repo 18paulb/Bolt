@@ -4,7 +4,6 @@ import * as db from './Database/db.js'
 import * as carousel from './Agents/carousel.js'
 import * as abandonedCart from './CRMApps/Shopify/ShopifyDataFetchers/AbandonedCartFetcher.js'
 import * as compatibility from './Agents/compatibilityCheck.js'
-import {checkBulkCompatibility} from "./Agents/compatibilityCheck.js";
 
 const app = express();
 const port = 3000;
@@ -104,7 +103,7 @@ app.post("/saveSentSurvey", async (req, res) => {
     }
 })
 
-app.get("/getReviewTemplates/:userId", async (req, res) => {
+app.get("/getTemplates/:userId", async (req, res) => {
     try {
         const userId = req.params.userId;
         let result = await db.getAllTemplates(userId);

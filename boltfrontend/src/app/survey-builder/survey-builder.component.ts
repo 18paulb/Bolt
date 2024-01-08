@@ -31,7 +31,7 @@ export class SurveyBuilderComponent {
   }
 
   async saveTemplate() {
-    let survey:SurveyTemplate = new SurveyTemplate(this.questions)
+    let survey:SurveyTemplate = new SurveyTemplate(this.questions, "")
 
     // const surveyJson = JSON.stringify(survey);
 
