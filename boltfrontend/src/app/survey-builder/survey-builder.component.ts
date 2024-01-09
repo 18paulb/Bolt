@@ -31,9 +31,7 @@ export class SurveyBuilderComponent {
   }
 
   async saveTemplate() {
-    let survey:SurveyTemplate = new SurveyTemplate(this.questions)
-
-    // const surveyJson = JSON.stringify(survey);
+    let survey:SurveyTemplate = new SurveyTemplate(this.questions, "")
 
     await lastValueFrom(this.http.post("http://localhost:3000/surveyTemplate", survey))
 

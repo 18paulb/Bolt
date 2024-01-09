@@ -6,8 +6,7 @@ rbmApiHelper.initRbmApi(privateKey);
 rbmApiHelper.setAgentId(config.agentId);
 
 // Send a capability check to the device
-export async function checkCompatibility(phoneNumber) {
-    await rbmApiHelper.checkCapability(phoneNumber, function (response) {
-         return response.status === 200
-    });
+export async function checkBulkCompatibility(phoneNumbers) {
+    let result = await rbmApiHelper.getUsers(phoneNumbers, null);
+    return result.data.reachableUsers;
 }

@@ -52,7 +52,7 @@ export async function getAllTemplates(ownerId) {
 
     // Define the filter criteria
     const filter = {};
-    filter["ownerId"] = ownerId;
+    filter.ownerId = ownerId;
 
     let collection = db.collection("Templates")
 
@@ -84,10 +84,10 @@ export async function getAllTemplates(ownerId) {
     return results;
 }
 
-export async function saveSentSurvey(survey) {
+export async function saveSentSurvey(questions, phoneNumber) {
     let db = await connectToDatabase();
 
-    let surveyModel = new SurveyModel(survey.phoneNumber, survey.questions, Date.now())
+    let surveyModel = new SurveyModel(phoneNumber, questions, Date.now())
 
     // Add extra data to the survey, ie hasAnswered/response fields
     for (let i = 0; i < surveyModel.questions.length; ++i) {

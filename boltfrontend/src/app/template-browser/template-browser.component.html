@@ -1,3 +1,8 @@
+<h1>Phone Numbers To Send To</h1>
+<div *ngFor="let number of phoneNumbers">
+  <p>{{number}}</p>
+</div>
+
 <h1>Review Templates</h1>
 <div *ngFor="let template of reviewTemplates">
   <p>ImageUrl: {{template.imageUrl}}</p>
@@ -7,7 +12,7 @@
     Suggested Response: {{suggestedResponse}}
   </p>
   <button (click)="sendReviewTemplate(template)">send this template</button>
-  <button (click)="deleteReviewTemplate(template)">delete this template</button>
+  <button (click)="deleteTemplate(template)">delete this template</button>
 </div>
 
 <h1>Survey Templates</h1>
@@ -22,5 +27,5 @@
     </p>
   </div>
   <button (click)="sendSurveyTemplate(template)">send this template</button>
-  <button>delete this template</button>
+  <button (click)="deleteTemplate(template)">delete this template</button>
 </div>

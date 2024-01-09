@@ -27,25 +27,26 @@ export function sendReviewTemplate(reviewTemplate, phoneNumber) {
 
     let suggestions = []
 
-    for (let i = 0; i < reviewTemplate["suggestedResponses"].length; ++i) {
+    for (let i = 0; i < reviewTemplate.suggestedResponses.length; ++i) {
         suggestions.push(        {
             reply: {
-                'text': reviewTemplate["suggestedResponses"][i],
+                'text': reviewTemplate.suggestedResponses[i],
                 'postbackData': 'REVIEW_ANSWER_'+i
             },
         })
     }
 
     const params = {
-        messageText: reviewTemplate["messageText"],
-        messageDescription: reviewTemplate["messageDescription"],
+        messageText: reviewTemplate.messageText,
+        messageDescription: reviewTemplate.messageDescription,
             msisdn: phoneNumber,
         suggestions: suggestions,
-        imageUrl: reviewTemplate["imageUrl"],
+        imageUrl: reviewTemplate.imageUrl,
         height: 'MEDIUM'
     }
 
     // Send the card to the device
+    // TODO: Consider wrapping a promise so that the callback function is waited upon until we can tell if it was successful or not
     rbmApiHelper.sendRichCard(params, function(response, err) {
             if (err !== undefined) {
                 console.log(
