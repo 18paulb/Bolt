@@ -147,24 +147,6 @@ export async function getReview(reviewId) {
     return documents[0]
 }
 
-export async function getReviewByPhoneNumber(phoneNumber) {
-    let db = await connectToDatabase();
-
-    const filter = {phoneNumber: phoneNumber}
-
-    let collection = db.collection('Conversation')
-
-    // FIXME: This is not a long term solution for making sure the correct review is fetched
-    // This should get the latest review sent to a phone number
-    const latestDocument = await collection.find(filter)
-        .sort({date: -1})
-        .limit(1)
-        .toArray();
-
-    return latestDocument.length > 0 ? latestDocument[0] : null;
-
-}
-
 export async function updateConversation(conversation) {
     try {
         let db = await connectToDatabase();
@@ -197,24 +179,6 @@ export async function getSurvey(surveyId) {
     const documents = await collection.find(filter).toArray();
 
     return documents[0]
-}
-
-export async function getSurveyByPhoneNumber(phoneNumber) {
-    let db = await connectToDatabase();
-
-    const filter = {phoneNumber: phoneNumber}
-
-    let collection = db.collection('Conversation')
-
-    // FIXME: This is not a long term solution for making sure the correct survey is fetched
-    // This should get the latest survey sent to a phone number
-    const latestDocument = await collection.find(filter)
-        .sort({date: -1})
-        .limit(1)
-        .toArray();
-
-    return latestDocument.length > 0 ? latestDocument[0] : null;
-
 }
 
 export async function saveSurveyTemplate(survey) {
