@@ -44,7 +44,7 @@ export class TemplateBrowserComponent implements OnInit {
       }
 
       if (result.templateType === "Survey") {
-        this.surveyTemplates.push(new SurveyTemplate(result.questions, result.id))
+        this.surveyTemplates.push(new SurveyTemplate(result.questions, result.openingText, result.id))
       }
     }
   }

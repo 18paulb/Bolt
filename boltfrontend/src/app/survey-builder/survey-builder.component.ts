@@ -21,17 +21,18 @@ export class SurveyBuilderComponent {
 
   newResponse:string = ""
 
+  openingText:string = ""
+
   addQuestion() {
     let newQuestion:Question = new Question(this.currQuestion, this.suggestedAnswers)
     this.questions.push(newQuestion)
 
     this.suggestedAnswers = []
     this.currQuestion = ""
-
   }
 
   async saveTemplate() {
-    let survey:SurveyTemplate = new SurveyTemplate(this.questions, "")
+    let survey:SurveyTemplate = new SurveyTemplate(this.questions, this.openingText, "")
 
     await lastValueFrom(this.http.post("http://localhost:3000/surveyTemplate", survey))
 

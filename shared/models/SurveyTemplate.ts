@@ -1,11 +1,13 @@
 import {Template} from "./Template";
 
 export class SurveyTemplate extends Template {
+    openingText:string
     questions:Question[]
 
 
-    constructor(questions: Question[], objectId:string) {
+    constructor(questions: Question[], openingText:string, objectId:string) {
         super(objectId)
+        this.openingText = openingText;
         this.questions = questions;
     }
 }
