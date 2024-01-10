@@ -124,12 +124,11 @@ async function handleSurveyMessage(msisdn, message) {
     if (msisdn !== survey.phoneNumber) return null;
 
     // Save the answer to the question
-    for (let i = 0; i < survey.questions.length; ++i) {
-        if (!survey.questions[i].hasResponded) {
-            survey.questions[i].hasResponded = true;
-            survey.questions[i].response = message
-            break;
-        }
+    const unansweredQuestion = survey.questions.find(question => !question.hasResponded);
+
+    if (unansweredQuestion) {
+        unansweredQuestion.hasResponded = true;
+        unansweredQuestion.response = message;
     }
 
     // Update the survey in the database to have the most recent answer
