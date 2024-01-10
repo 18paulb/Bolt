@@ -3,14 +3,13 @@
 <h1>Current Questions In Survey</h1>
 
 <h3>Opening Survey Text</h3>
-<form>
-  <textarea [(ngModel)]="openingText" style="width:500px; resize: none;" placeholder="e.g. Thanks for agreeing to participate in this Survey"></textarea>
-</form>
+<textarea [(ngModel)]="openingText" style="width:500px; resize: none;"
+          placeholder="e.g. Thanks for agreeing to participate in this Survey"></textarea>
 
 <div *ngFor="let question of questions">
-  <p>Question: {{question.question}}</p>
+  <p>Question: {{ question.question }}</p>
   <p *ngFor="let answer of question.answers">
-    Answer: {{answer}}
+    Answer: {{ answer }}
   </p>
 </div>
 
@@ -31,5 +30,10 @@
 </form>
 
 <br>
+
+<h3>Closing Survey Text</h3>
+<textarea [(ngModel)]="closingText" style="width:500px; resize: none;"
+          placeholder="e.g. Thank you for finishing the survey, you have been awarded 50 points"></textarea>
+
 
 <button (click)="saveTemplate()">Save Template</button>

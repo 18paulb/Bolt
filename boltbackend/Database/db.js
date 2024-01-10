@@ -73,7 +73,7 @@ export async function getAllTemplates(ownerId) {
         }
 
         if (doc.templateType === "Survey") {
-            let model = new SurveyTemplateModel(doc.questions, doc.openingText)
+            let model = new SurveyTemplateModel(doc.questions, doc.openingText, doc.closingText)
             model.id = doc._id.toString()
             model.templateType = "Survey"
             results.push(model)
@@ -84,10 +84,10 @@ export async function getAllTemplates(ownerId) {
     return results;
 }
 
-export async function saveSentSurvey(questions, phoneNumber) {
+export async function saveSentSurvey(questions, phoneNumber, openingText, closingText) {
     let db = await connectToDatabase();
 
-    let surveyModel = new SurveyModel(phoneNumber, questions, Date.now())
+    let surveyModel = new SurveyModel(phoneNumber, questions, openingText, closingText, Date.now())
 
     // Add extra data to the survey, ie hasAnswered/response fields
     for (let i = 0; i < surveyModel.questions.length; ++i) {
@@ -226,7 +226,7 @@ export async function saveSurveyTemplate(survey) {
 
     let collection = db.collection("Templates")
 
-    let surveyModel = new SurveyTemplateModel(survey.questions, survey.openingText, "brandon");
+    let surveyModel = new SurveyTemplateModel(survey.questions, survey.openingText, survey.closingText, "brandon");
     surveyModel.templateType = "Survey"
 
     await collection.insertOne(surveyModel);

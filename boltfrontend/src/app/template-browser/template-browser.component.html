@@ -18,6 +18,10 @@
 <h1>Survey Templates</h1>
 <div *ngFor="let template of surveyTemplates">
   <h2>Survey</h2>
+
+  <h4>Opening Text</h4>
+  <p>{{template.openingText}}</p>
+
   <div *ngFor="let question of template.questions">
     <h4>Question</h4>
     <p>{{question.question}}</p>
@@ -26,6 +30,10 @@
       {{answer}}
     </p>
   </div>
+
+  <h4>Closing Text</h4>
+  <p>{{template.closingText}}</p>
+
   <button (click)="sendSurveyTemplate(template)">send this template</button>
   <button (click)="deleteTemplate(template)">delete this template</button>
 </div>

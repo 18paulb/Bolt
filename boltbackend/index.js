@@ -93,7 +93,7 @@ app.post("/saveSentSurvey", async (req, res) => {
     try {
         let phoneNumbers = req.body.phoneNumbers
         for (let i = 0; i < phoneNumbers.length; ++i) {
-            surveyIdMap[phoneNumbers[i]] = await db.saveSentSurvey(req.body.questions, phoneNumbers[i])
+            surveyIdMap[phoneNumbers[i]] = await db.saveSentSurvey(req.body.questions, phoneNumbers[i], req.body.openingText, req.body.closingText)
         }
 
         res.status(200).json(surveyIdMap)

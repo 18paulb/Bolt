@@ -34,14 +34,12 @@ app.post('/startSurvey', async function (req, res, next) {
 
         let surveyIdMap = req.body
 
-        const messageText = 'Thanks for agreeing to participate in this survey, to opt out, please respond STOP';
-
         for (const [phoneNumber, surveyId] of Object.entries(surveyIdMap)) {
             let survey = await db.getSurvey(surveyId)
 
             const params = {
-                messageText: messageText,
-                msisdn: phoneNumber,
+                messageText: survey.openingText,
+                msisdn: phoneNumber
             };
 
             // 1. First this sends a message via params
@@ -152,7 +150,7 @@ async function handleSurveyMessage(msisdn, message) {
 
     if (allQuestionsAnswered) {
         const params = {
-            messageText: "Thank you for completing the survey!",
+            messageText: survey.closingText,
             msisdn: msisdn,
         };
         await rbmApiHelper.sendMessage(params,

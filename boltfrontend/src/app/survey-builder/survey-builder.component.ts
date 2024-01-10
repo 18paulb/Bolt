@@ -1,7 +1,9 @@
 import { Component } from '@angular/core';
 import {HttpClient} from "@angular/common/http";
+import {FormsModule} from "@angular/forms";
 import {lastValueFrom} from "rxjs";
 import {SurveyTemplate, Question} from "../../../../shared/models/SurveyTemplate"
+
 
 @Component({
   selector: 'app-survey-builder',
@@ -23,6 +25,8 @@ export class SurveyBuilderComponent {
 
   openingText:string = ""
 
+  closingText:string = ""
+
   addQuestion() {
     let newQuestion:Question = new Question(this.currQuestion, this.suggestedAnswers)
     this.questions.push(newQuestion)
@@ -32,11 +36,18 @@ export class SurveyBuilderComponent {
   }
 
   async saveTemplate() {
-    let survey:SurveyTemplate = new SurveyTemplate(this.questions, this.openingText, "")
+
+    debugger
+
+    let survey:SurveyTemplate = new SurveyTemplate(this.questions, this.openingText, this.closingText, "")
 
     await lastValueFrom(this.http.post("http://localhost:3000/surveyTemplate", survey))
 
     this.questions = []
+    this.suggestedAnswers = []
+    this.openingText = ""
+    this.closingText = ""
+    this.newResponse = ""
   }
 
   addUserResponse() {
