@@ -129,10 +129,10 @@ async function handleSurveyMessage(msisdn, message) {
     if (unansweredQuestion) {
         unansweredQuestion.hasResponded = true;
         unansweredQuestion.response = message;
-    }
+        // Update the survey in the database to have the most recent answer
+        db.updateConversation(survey).catch(console.dir)
 
-    // Update the survey in the database to have the most recent answer
-    db.updateConversation(survey).catch(console.dir)
+    }
 
     const allQuestionsAnswered = survey.questions.every(question => question.hasResponded);
 
@@ -145,9 +145,7 @@ async function handleSurveyMessage(msisdn, message) {
             msisdn: msisdn,
         };
 
-        await rbmApiHelper.sendMessage(params, (response, err) => {
-            console.log("Survey is done");
-        });
+        await rbmApiHelper.sendMessage(params, null);
     }
 }
 
