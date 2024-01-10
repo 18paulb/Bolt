@@ -119,7 +119,7 @@ function sendSurveyQuestion(msisdn, question) {
  * @returns {Promise<void>}
  */
 async function handleSurveyMessage(msisdn, message) {
-    let survey = await db.getSurveyByPhoneNumber(msisdn)
+    let survey = await db.getLatestSent(msisdn)
 
     // Save the answer to the question
     for (let i = 0; i < survey.questions.length; ++i) {
@@ -131,7 +131,7 @@ async function handleSurveyMessage(msisdn, message) {
     }
 
     // Update the survey in the database to have the most recent answer
-    db.updateSurvey(survey, survey._id.toString()).catch(console.dir)
+    db.updateConversation(survey).catch(console.dir)
 
     // Go to the next question in the survey and send that
     let allQuestionsAnswered = true;
@@ -165,12 +165,12 @@ async function handleSurveyMessage(msisdn, message) {
  * @returns {Promise<void>}
  */
 async function handleReviewMessage(msisdn, message) {
-    let review = await db.getReviewByPhoneNumber(msisdn, message)
+    let review = await db.getLatestSent(msisdn)
 
     review.hasResponded = true
     review.response = message
 
-    db.updateReview(review, review._id).catch(console.dir)
+    db.updateConversation(review).catch(console.dir)
 }
 
 // FIXME: This is a test for now
@@ -198,26 +198,21 @@ async function handleMessage(userEvent) {
 
         // check to see that we have a message to process
         if (message) {
-            //FIXME: If there is no message postback data to suggested responses this won't work (ie a free response)
-            // Ideas for how to fix this:
-            // 1. We could make it so that any text after a question goes to the answer of that question (but then if they make a mistake text that would screw things up as we would only take the immediate next text)
 
-            // This is to handle any suggestedResponse answers
-            if (userEvent.suggestionResponse?.postbackData.includes("SURVEY")) {
-                await handleSurveyMessage(msisdn, message)
-            } else if (userEvent.suggestionResponse?.postbackData.includes("REVIEW")) {
-                await handleReviewMessage(msisdn, message)
-            }
-            // This means that they do not do a suggested response, so either it is open-ended question or they did not answer correctly
-            else if (userEvent.suggestionResponse == null) {
-                // Options to go about this
-                /*
-                1. Get the most recent of ANY survey/review/etc. sent and save the response to that
-                2. Change the way we store latest whatever. Have a phoneNumber collection and anytime we send something to a User, update the "latestSent" field to the ID of whatever was sent, that way we know what
-                was sent the latest and can grab that without worrying about grabbing by most recent timestamp. CONS: We have to store phoneNumbers we get, not sure if that would be a problem
-                 */
-                await handleFreeResponseMessage(msisdn, message)
+            // FIXME: Not sure if I should check if conversation is of TemplateType whatever here or depend on postbackData
+            let conversation = await db.getLatestSent(msisdn)
 
+            switch (conversation.templateType) {
+                case "Survey":
+                    await handleSurveyMessage(msisdn, message)
+                    break;
+
+                case "Review":
+                    await handleReviewMessage(msisdn, message)
+                    break;
+
+                default:
+                    console.log("Something went wrong because it should either be Survey or Review")
             }
         }
     }

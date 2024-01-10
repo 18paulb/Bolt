@@ -5,6 +5,7 @@ export class SurveyModel {
     openingText
     closingText
     // Date will be Epoch time in milliseconds
+    templateType
     date
 
     constructor(phoneNumber, questions, openingText, closingText, date) {
@@ -13,5 +14,6 @@ export class SurveyModel {
         this.openingText = openingText;
         this.closingText = closingText;
         this.date = date
+        this.templateType = "Survey"
     }
 }
