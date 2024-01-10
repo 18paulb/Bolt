@@ -16,7 +16,7 @@ const subscriptionName = 'projects/rbm-test-vgw4szq/subscriptions/rbm-agent-subs
 // initialize Pub/Sub for pull subscription listener
 // this is how this agent will receive messages from the client
 rbmApiHelper.initRbmApi(rbmPrivatekey);
-initPubsub();
+initPubSub();
 
 app.use(
     cors({
@@ -225,7 +225,7 @@ function getMessageBody(userEvent) {
  * Initializes a pull subscription message handler
  * to receive messages from Pub/Sub.
  */
-function initPubsub() {
+function initPubSub() {
 
     const pubsub = new PubSub({
         projectId: rbmPrivatekey.project_id,
