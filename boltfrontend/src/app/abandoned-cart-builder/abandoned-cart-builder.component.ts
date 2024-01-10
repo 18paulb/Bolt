@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {lastValueFrom} from "rxjs";
 import {HttpClient} from "@angular/common/http";
 
@@ -9,7 +9,7 @@ import {HttpClient} from "@angular/common/http";
 })
 export class AbandonedCartBuilderComponent {
 
-  constructor(private http:HttpClient){
+  constructor(private http: HttpClient) {
   }
 
   async sendAbandonedCart() {
@@ -19,7 +19,7 @@ export class AbandonedCartBuilderComponent {
 
 
 interface CartItem {
-  name:string,
-  price:number,
-  image:string
+  name: string,
+  price: number,
+  image: string
 }

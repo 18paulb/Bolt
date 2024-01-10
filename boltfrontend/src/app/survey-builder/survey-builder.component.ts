@@ -1,8 +1,7 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
-import {FormsModule} from "@angular/forms";
 import {lastValueFrom} from "rxjs";
-import {SurveyTemplate, Question} from "../../../../shared/models/SurveyTemplate"
+import {Question, SurveyTemplate} from "../../../../shared/models/SurveyTemplate"
 
 
 @Component({
@@ -12,23 +11,23 @@ import {SurveyTemplate, Question} from "../../../../shared/models/SurveyTemplate
 })
 export class SurveyBuilderComponent {
 
-  constructor(private http:HttpClient) {
+  constructor(private http: HttpClient) {
   }
 
-  questions:Question[] = []
+  questions: Question[] = []
 
-  currQuestion:string = ""
+  currQuestion: string = ""
 
-  suggestedResponses:string[] = []
+  suggestedResponses: string[] = []
 
-  newResponse:string = ""
+  newResponse: string = ""
 
-  openingText:string = ""
+  openingText: string = ""
 
-  closingText:string = ""
+  closingText: string = ""
 
   addQuestion() {
-    let newQuestion:Question = new Question(this.currQuestion, this.suggestedResponses)
+    let newQuestion: Question = new Question(this.currQuestion, this.suggestedResponses)
     this.questions.push(newQuestion)
 
     this.suggestedResponses = []
@@ -37,7 +36,7 @@ export class SurveyBuilderComponent {
 
   async saveTemplate() {
 
-    let survey:SurveyTemplate = new SurveyTemplate(this.questions, this.openingText, this.closingText, "")
+    let survey: SurveyTemplate = new SurveyTemplate(this.questions, this.openingText, this.closingText, "")
 
     await lastValueFrom(this.http.post("http://localhost:3000/surveyTemplate", survey))
 

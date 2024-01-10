@@ -115,8 +115,8 @@ async function updateRecipientLastSent(phoneNumber, lastSentId) {
     let recipientModel = new RecipientModel(phoneNumber, lastSentId)
 
     const result = await collection.updateOne(
-        { phoneNumber: phoneNumber }, // Filter criteria: match documents with this surveyId
-        { $set: recipientModel }   // Update operation: set the new values from `survey`
+        {phoneNumber: phoneNumber}, // Filter criteria: match documents with this surveyId
+        {$set: recipientModel}   // Update operation: set the new values from `survey`
     );
 }
 
@@ -136,10 +136,10 @@ export async function saveSentReview(review, phoneNumber) {
     return id
 }
 
-export async function getReview(reviewId){
+export async function getReview(reviewId) {
     let db = await connectToDatabase();
 
-    const filter = { _id: new ObjectId(reviewId) }
+    const filter = {_id: new ObjectId(reviewId)}
 
     let collection = db.collection('Conversation')
     const documents = await collection.find(filter).toArray();
@@ -150,14 +150,14 @@ export async function getReview(reviewId){
 export async function getReviewByPhoneNumber(phoneNumber) {
     let db = await connectToDatabase();
 
-    const filter = { phoneNumber: phoneNumber}
+    const filter = {phoneNumber: phoneNumber}
 
     let collection = db.collection('Conversation')
 
     // FIXME: This is not a long term solution for making sure the correct review is fetched
     // This should get the latest review sent to a phone number
     const latestDocument = await collection.find(filter)
-        .sort({ date: -1 })
+        .sort({date: -1})
         .limit(1)
         .toArray();
 
@@ -170,8 +170,8 @@ export async function updateConversation(conversation) {
         let db = await connectToDatabase();
 
         const result = await db.collection('Conversation').updateOne(
-            { _id: conversation._id }, // Filter criteria: match documents with this surveyId
-            { $set: conversation }   // Update operation: set the new values from `survey`
+            {_id: conversation._id}, // Filter criteria: match documents with this surveyId
+            {$set: conversation}   // Update operation: set the new values from `survey`
         );
 
         if (result.modifiedCount === 0) {
@@ -190,7 +190,7 @@ export async function updateConversation(conversation) {
 export async function getSurvey(surveyId) {
     let db = await connectToDatabase();
 
-    const filter = { _id: new ObjectId(surveyId) }
+    const filter = {_id: new ObjectId(surveyId)}
 
     let collection = db.collection('Conversation')
 
@@ -202,14 +202,14 @@ export async function getSurvey(surveyId) {
 export async function getSurveyByPhoneNumber(phoneNumber) {
     let db = await connectToDatabase();
 
-    const filter = { phoneNumber: phoneNumber}
+    const filter = {phoneNumber: phoneNumber}
 
     let collection = db.collection('Conversation')
 
     // FIXME: This is not a long term solution for making sure the correct survey is fetched
     // This should get the latest survey sent to a phone number
     const latestDocument = await collection.find(filter)
-        .sort({ date: -1 })
+        .sort({date: -1})
         .limit(1)
         .toArray();
 

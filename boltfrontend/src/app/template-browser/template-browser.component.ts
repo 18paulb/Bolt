@@ -91,7 +91,7 @@ export class TemplateBrowserComponent implements OnInit {
       "phoneNumbers": phoneNumbers
     }
 
-    let res:any = await lastValueFrom(this.http.post("http://localhost:3000/compatibilityCheck/", body))
+    let res: any = await lastValueFrom(this.http.post("http://localhost:3000/compatibilityCheck/", body))
 
     return res.phoneNumbers;
   }

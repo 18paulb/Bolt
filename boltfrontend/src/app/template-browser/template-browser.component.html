@@ -1,15 +1,15 @@
 <h1>Phone Numbers To Send To</h1>
 <div *ngFor="let number of phoneNumbers">
-  <p>{{number}}</p>
+  <p>{{ number }}</p>
 </div>
 
 <h1>Review Templates</h1>
 <div *ngFor="let template of reviewTemplates">
-  <p>ImageUrl: {{template.imageUrl}}</p>
-  <p>Message Text: {{template.messageText}}</p>
-  <p>Message Description: {{template.messageDescription}}</p>
+  <p>ImageUrl: {{ template.imageUrl }}</p>
+  <p>Message Text: {{ template.messageText }}</p>
+  <p>Message Description: {{ template.messageDescription }}</p>
   <p *ngFor="let suggestedResponse of template.suggestedResponses">
-    Suggested Response: {{suggestedResponse}}
+    Suggested Response: {{ suggestedResponse }}
   </p>
   <button (click)="sendReviewTemplate(template)">send this template</button>
   <button (click)="deleteTemplate(template)">delete this template</button>
@@ -20,19 +20,19 @@
   <h2>Survey</h2>
 
   <h4>Opening Text</h4>
-  <p>{{template.openingText}}</p>
+  <p>{{ template.openingText }}</p>
 
   <div *ngFor="let question of template.questions">
     <h4>Question</h4>
-    <p>{{question.question}}</p>
+    <p>{{ question.question }}</p>
     <h4>Answers</h4>
     <p *ngFor="let answer of question.answers">
-      {{answer}}
+      {{ answer }}
     </p>
   </div>
 
   <h4>Closing Text</h4>
-  <p>{{template.closingText}}</p>
+  <p>{{ template.closingText }}</p>
 
   <button (click)="sendSurveyTemplate(template)">send this template</button>
   <button (click)="deleteTemplate(template)">delete this template</button>

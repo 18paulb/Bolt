@@ -1,6 +1,7 @@
 import {config} from './config.js'
 import rbmApiHelper from '@google/rcsbusinessmessaging'
 import privateKey from './rbm-credentials.json' assert {type: 'json'};
+
 rbmApiHelper.initRbmApi(privateKey);
 rbmApiHelper.setAgentId(config.agentId);
 
