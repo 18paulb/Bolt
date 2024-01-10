@@ -3,7 +3,7 @@ import {PubSub} from '@google-cloud/pubsub';
 import * as db from './Database/db.js'
 import * as richCard from './Agents/richCard.js'
 
-import rbmPrivatekey from './Agents/rbm-credentials.json' assert {type: 'json'};
+import rbmPrivateKey from './Agents/rbm-credentials.json' assert {type: 'json'};
 import rbmApiHelper from '@google/rcsbusinessmessaging'
 import cors from "cors";
 
@@ -15,7 +15,7 @@ const subscriptionName = 'projects/rbm-test-vgw4szq/subscriptions/rbm-agent-subs
 
 // initialize Pub/Sub for pull subscription listener
 // this is how this agent will receive messages from the client
-rbmApiHelper.initRbmApi(rbmPrivatekey);
+rbmApiHelper.initRbmApi(rbmPrivateKey);
 initPubSub();
 
 app.use(
@@ -228,7 +228,7 @@ function getMessageBody(userEvent) {
 function initPubSub() {
 
     const pubsub = new PubSub({
-        projectId: rbmPrivatekey.project_id,
+        projectId: rbmPrivateKey.project_id,
         keyFilename: './Agents/rbm-credentials.json',
     });
 
@@ -252,7 +252,7 @@ function initPubSub() {
     // Listen for new messages until timeout is hit
     subscription.on('message', messageHandler);
 
-    console.log('initPubsub done');
+    console.log('initPubSub done');
 }
 
 app.listen(port, () => {
