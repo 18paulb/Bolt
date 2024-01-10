@@ -121,6 +121,8 @@ function sendSurveyQuestion(msisdn, question) {
 async function handleSurveyMessage(msisdn, message) {
     let survey = await db.getLatestSent(msisdn)
 
+    if (msisdn !== survey.phoneNumber) return null;
+
     // Save the answer to the question
     for (let i = 0; i < survey.questions.length; ++i) {
         if (!survey.questions[i].hasResponded) {
@@ -133,28 +135,20 @@ async function handleSurveyMessage(msisdn, message) {
     // Update the survey in the database to have the most recent answer
     db.updateConversation(survey).catch(console.dir)
 
-    // Go to the next question in the survey and send that
-    let allQuestionsAnswered = true;
-    if (msisdn === survey.phoneNumber) {
-        for (let i = 0; i < survey.questions.length; ++i) {
-            console.log(survey.questions[i]);
-            if (!survey.questions[i].hasResponded) {
-                allQuestionsAnswered = false;
-                sendSurveyQuestion(msisdn, survey.questions[i]).catch(console.dir)
-                break;
-            }
-        }
-    }
+    const allQuestionsAnswered = survey.questions.every(question => question.hasResponded);
 
-    if (allQuestionsAnswered) {
+    if (!allQuestionsAnswered) {
+        const unansweredQuestion = survey.questions.find(question => !question.hasResponded);
+        sendSurveyQuestion(msisdn, unansweredQuestion).catch(console.dir);
+    } else {
         const params = {
             messageText: survey.closingText,
             msisdn: msisdn,
         };
-        await rbmApiHelper.sendMessage(params,
-            function (response, err) {
-                console.log("Survey is done")
-            });
+
+        await rbmApiHelper.sendMessage(params, (response, err) => {
+            console.log("Survey is done");
+        });
     }
 }
 
@@ -173,19 +167,13 @@ async function handleReviewMessage(msisdn, message) {
     db.updateConversation(review).catch(console.dir)
 }
 
-// FIXME: This is a test for now
-async function handleFreeResponseMessage(msisdn, message) {
-    // Get the  most recent thing sent (in this case Survey or Review)
-}
-
 /**
  * Uses the event received by the pull subscription to send a
  * response to the client's device.
  * @param {object} userEvent The JSON object of a message received by the pull subscription.
- * Depending on the postbackData of the response, different logic will be applied (ie handle survey vs review response
+ * Grabs the most recent conversation of that phoneNumber and saves the response
  */
 async function handleMessage(userEvent) {
-    // get the sender's phone number
     const msisdn = userEvent.senderPhoneNumber
 
     if (msisdn !== undefined) {
@@ -199,7 +187,6 @@ async function handleMessage(userEvent) {
         // check to see that we have a message to process
         if (message) {
 
-            // FIXME: Not sure if I should check if conversation is of TemplateType whatever here or depend on postbackData
             let conversation = await db.getLatestSent(msisdn)
 
             switch (conversation.templateType) {
