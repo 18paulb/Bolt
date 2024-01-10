@@ -19,7 +19,7 @@ export class SurveyBuilderComponent {
 
   currQuestion:string = ""
 
-  suggestedAnswers:string[] = []
+  suggestedResponses:string[] = []
 
   newResponse:string = ""
 
@@ -28,35 +28,37 @@ export class SurveyBuilderComponent {
   closingText:string = ""
 
   addQuestion() {
-    let newQuestion:Question = new Question(this.currQuestion, this.suggestedAnswers)
+    let newQuestion:Question = new Question(this.currQuestion, this.suggestedResponses)
     this.questions.push(newQuestion)
 
-    this.suggestedAnswers = []
+    this.suggestedResponses = []
     this.currQuestion = ""
   }
 
   async saveTemplate() {
-
-    debugger
 
     let survey:SurveyTemplate = new SurveyTemplate(this.questions, this.openingText, this.closingText, "")
 
     await lastValueFrom(this.http.post("http://localhost:3000/surveyTemplate", survey))
 
     this.questions = []
-    this.suggestedAnswers = []
+    this.suggestedResponses = []
     this.openingText = ""
     this.closingText = ""
     this.newResponse = ""
   }
 
   addUserResponse() {
-    this.suggestedAnswers.push(this.newResponse);
+    if (this.suggestedResponses.length >= 11) return;
+
+    if (this.newResponse.length == 0) return;
+
+    this.suggestedResponses.push(this.newResponse);
     this.newResponse = ""
   }
 
   removeUserResponse(index: number) {
-    this.suggestedAnswers.splice(index, 1);
+    this.suggestedResponses.splice(index, 1);
   }
 
 }

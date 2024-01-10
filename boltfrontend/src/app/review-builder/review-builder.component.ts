@@ -30,6 +30,8 @@ export class ReviewBuilderComponent {
   }
 
   addUserResponse() {
+    if (this.suggestedResponses.length >= 11) return;
+
     this.suggestedResponses.push(this.newResponse);
     this.newResponse = ""
   }

@@ -33,13 +33,13 @@ export async function saveReviewTemplate(template) {
     let reviewModel = new ReviewTemplateModel(template.imageUrl, template.messageText, template.messageDescription, template.suggestedResponses, "brandon")
     reviewModel.templateType = "Review"
 
-    await db.collection('Templates').insertOne(reviewModel);
+    await db.collection('Template').insertOne(reviewModel);
 }
 
 export async function deleteTemplate(templateId) {
     let db = await connectToDatabase();
 
-    let collection = db.collection('Templates');
+    let collection = db.collection('Template');
 
     // Specify the filter criteria to delete by _id
     const filter = {_id: new ObjectId(templateId)};
@@ -54,7 +54,7 @@ export async function getAllTemplates(ownerId) {
     const filter = {};
     filter.ownerId = ownerId;
 
-    let collection = db.collection("Templates")
+    let collection = db.collection("Template")
 
     // Fetch documents matching the filter criteria
     const documents = await collection.find(filter).toArray();
@@ -224,10 +224,13 @@ export async function getSurveyByPhoneNumber(phoneNumber) {
 export async function saveSurveyTemplate(survey) {
     let db = await connectToDatabase();
 
-    let collection = db.collection("Templates")
+    let collection = db.collection("Template")
 
     let surveyModel = new SurveyTemplateModel(survey.questions, survey.openingText, survey.closingText, "brandon");
     surveyModel.templateType = "Survey"
 
     await collection.insertOne(surveyModel);
+}
+
+export async function getLatestSent(msisdn) {
 }

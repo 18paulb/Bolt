@@ -19,8 +19,8 @@
   <textarea class="text-box" [(ngModel)]="currQuestion" name="currQuestion" type="text"></textarea>
 
   <label>Possible Answers</label>
-  <div *ngFor="let response of suggestedAnswers; let i = index">
-    <input [(ngModel)]="suggestedAnswers[i]" name="suggestedResponse{{i}}" type="text">
+  <div *ngFor="let response of suggestedResponses; let i = index">
+    <input [(ngModel)]="suggestedResponses[i]" name="suggestedResponse{{i}}" type="text">
     <button class="submit-button" type="button" (click)="removeUserResponse(i)">Remove</button>
   </div>
   <input [(ngModel)]="newResponse" name="newResponse" type="text" placeholder="Insert a new response">
