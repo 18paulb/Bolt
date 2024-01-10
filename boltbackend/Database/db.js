@@ -73,7 +73,7 @@ export async function getAllTemplates(ownerId) {
         }
 
         if (doc.templateType === "Survey") {
-            let model = new SurveyTemplateModel(doc.questions)
+            let model = new SurveyTemplateModel(doc.questions, doc.openingText)
             model.id = doc._id.toString()
             model.templateType = "Survey"
             results.push(model)
@@ -226,7 +226,7 @@ export async function saveSurveyTemplate(survey) {
 
     let collection = db.collection("Templates")
 
-    let surveyModel = new SurveyTemplateModel(survey.questions, "brandon");
+    let surveyModel = new SurveyTemplateModel(survey.questions, survey.openingText, "brandon");
     surveyModel.templateType = "Survey"
 
     await collection.insertOne(surveyModel);

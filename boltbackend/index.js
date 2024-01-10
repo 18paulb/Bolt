@@ -2,7 +2,6 @@ import express from 'express';
 import cors from 'cors'
 import * as db from './Database/db.js'
 import * as carousel from './Agents/carousel.js'
-import * as abandonedCart from './CRMApps/Shopify/ShopifyDataFetchers/AbandonedCartFetcher.js'
 import * as compatibility from './Agents/compatibilityCheck.js'
 
 const app = express();

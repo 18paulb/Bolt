@@ -1,6 +1,12 @@
 <h1>Create Your Survey Template</h1>
 
 <h1>Current Questions In Survey</h1>
+
+<h3>Opening Survey Text</h3>
+<form>
+  <textarea [(ngModel)]="openingText" style="width:500px; resize: none;" placeholder="e.g. Thanks for agreeing to participate in this Survey"></textarea>
+</form>
+
 <div *ngFor="let question of questions">
   <p>Question: {{question.question}}</p>
   <p *ngFor="let answer of question.answers">
@@ -11,17 +17,17 @@
 <form (ngSubmit)="addQuestion()" style="display: flex; flex-direction: column">
 
   <label>New Question</label>
-  <textarea [(ngModel)]="currQuestion" name="currQuestion" type="text"></textarea>
+  <textarea class="text-box" [(ngModel)]="currQuestion" name="currQuestion" type="text"></textarea>
 
   <label>Possible Answers</label>
   <div *ngFor="let response of suggestedAnswers; let i = index">
     <input [(ngModel)]="suggestedAnswers[i]" name="suggestedResponse{{i}}" type="text">
-    <button type="button" (click)="removeUserResponse(i)">Remove</button>
+    <button class="submit-button" type="button" (click)="removeUserResponse(i)">Remove</button>
   </div>
   <input [(ngModel)]="newResponse" name="newResponse" type="text" placeholder="Insert a new response">
   <button type="button" (click)="addUserResponse()">Add Response</button>
 
-  <button type="submit">Submit</button>
+  <button class="submit-button" type="submit">Submit</button>
 </form>
 
 <br>
