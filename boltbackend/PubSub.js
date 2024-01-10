@@ -186,6 +186,12 @@ async function handleMessage(userEvent) {
         // check to see that we have a message to process
         if (message) {
 
+            // TODO: Doesn't unsubscribe right now but at least sends the message
+            if (message === "STOP") {
+                await handleUnsubscribeMessage(message, msisdn)
+                return;
+            }
+
             let conversation = await db.getLatestSent(msisdn)
 
             switch (conversation.templateType) {
@@ -219,6 +225,16 @@ function getMessageBody(userEvent) {
     }
 
     return false;
+}
+
+async function handleUnsubscribeMessage(message, phoneNumber) {
+
+    const params = {
+        messageText: "You have successfully unsubscribed, no more messages will be sent to you",
+        msisdn: phoneNumber
+    };
+
+    await rbmApiHelper.sendMessage(params, null)
 }
 
 /**
