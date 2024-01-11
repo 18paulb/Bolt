@@ -65,7 +65,7 @@ app.post('/surveyTemplate', async (req, res) => {
 
 app.post('/sendAbandonedCart', async (req, res) => {
     try {
-        let cartData = abandonedCart.getAbandonedCarts()
+        let cartData = null;
         await carousel.sendCarousel(cartData)
         res.status(200).json({message: "Success"})
     } catch (error) {

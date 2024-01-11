@@ -152,11 +152,13 @@ async function handleSurveyMessage(msisdn, message) {
             msisdn: msisdn,
         };
 
-        //TODO: Consider after survey is completed to mark the Recipient "lastSent" as null so that nothing will be sent back
-        //  and we can ignore messages that are not answering anything
-
-
         await rbmApiHelper.sendMessage(params, null);
+
+        // Updates recipient so that when a message is sent after a conversation is finished nothing will be saved or happen
+        let recipient = await db.getRecipient(msisdn);
+        recipient.lastSent = null;
+
+        await db.updateRecipient(recipient);
     }
 
 }
@@ -203,6 +205,10 @@ async function handleMessage(userEvent) {
             }
 
             let conversation = await db.getLatestSent(msisdn)
+
+            if (conversation == null) {
+                return;
+            }
 
             switch (conversation.templateType) {
                 case "Survey":
