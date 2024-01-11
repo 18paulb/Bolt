@@ -45,7 +45,14 @@ app.post('/startSurvey', async function (req, res, next) {
             // 2. The callback function is then called (the 2nd parameter) after sendMessage is complete
             await rbmApiHelper.sendMessage(params,
                 function (response, err) {
-                    sendSurveyQuestion(phoneNumber, survey.questions[0])
+
+                    if (response != null) {
+                        sendSurveyQuestion(phoneNumber, survey.questions[0])
+                    }
+
+                    if (err != null) {
+                        console.log("There is something wrong with the message you are trying to send")
+                    }
                 });
         }
 
@@ -145,8 +152,13 @@ async function handleSurveyMessage(msisdn, message) {
             msisdn: msisdn,
         };
 
+        //TODO: Consider after survey is completed to mark the Recipient "lastSent" as null so that nothing will be sent back
+        //  and we can ignore messages that are not answering anything
+
+
         await rbmApiHelper.sendMessage(params, null);
     }
+
 }
 
 /**

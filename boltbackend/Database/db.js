@@ -142,9 +142,7 @@ export async function getReview(reviewId) {
     const filter = {_id: new ObjectId(reviewId)}
 
     let collection = db.collection('Conversation')
-    const documents = await collection.find(filter).toArray();
-
-    return documents[0]
+    return await collection.findOne(filter)
 }
 
 export async function updateConversation(conversation) {
@@ -176,9 +174,7 @@ export async function getSurvey(surveyId) {
 
     let collection = db.collection('Conversation')
 
-    const documents = await collection.find(filter).toArray();
-
-    return documents[0]
+    return await collection.findOne(filter)
 }
 
 export async function saveSurveyTemplate(survey) {
