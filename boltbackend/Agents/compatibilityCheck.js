@@ -1,7 +1,8 @@
 // Reference to RBM API helper
 import rbmApiHelper from '@google/rcsbusinessmessaging'
-import privateKey from './rbm-credentials.json' assert { type: 'json' };
+import privateKey from './rbm-credentials.json' assert {type: 'json'};
 import {config} from "./config.js";
+
 rbmApiHelper.initRbmApi(privateKey);
 rbmApiHelper.setAgentId(config.agentId);
 

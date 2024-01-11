@@ -3,14 +3,13 @@
 <h1>Current Questions In Survey</h1>
 
 <h3>Opening Survey Text</h3>
-<form>
-  <textarea [(ngModel)]="openingText" style="width:500px; resize: none;" placeholder="e.g. Thanks for agreeing to participate in this Survey"></textarea>
-</form>
+<textarea [(ngModel)]="openingText" style="width:500px; resize: none;"
+          placeholder="e.g. Thanks for agreeing to participate in this Survey"></textarea>
 
 <div *ngFor="let question of questions">
-  <p>Question: {{question.question}}</p>
+  <p>Question: {{ question.question }}</p>
   <p *ngFor="let answer of question.answers">
-    Answer: {{answer}}
+    Answer: {{ answer }}
   </p>
 </div>
 
@@ -20,8 +19,8 @@
   <textarea class="text-box" [(ngModel)]="currQuestion" name="currQuestion" type="text"></textarea>
 
   <label>Possible Answers</label>
-  <div *ngFor="let response of suggestedAnswers; let i = index">
-    <input [(ngModel)]="suggestedAnswers[i]" name="suggestedResponse{{i}}" type="text">
+  <div *ngFor="let response of suggestedResponses; let i = index">
+    <input [(ngModel)]="suggestedResponses[i]" name="suggestedResponse{{i}}" type="text">
     <button class="submit-button" type="button" (click)="removeUserResponse(i)">Remove</button>
   </div>
   <input [(ngModel)]="newResponse" name="newResponse" type="text" placeholder="Insert a new response">
@@ -31,5 +30,10 @@
 </form>
 
 <br>
+
+<h3>Closing Survey Text</h3>
+<textarea [(ngModel)]="closingText" style="width:500px; resize: none;"
+          placeholder="e.g. Thank you for finishing the survey, you have been awarded 50 points"></textarea>
+
 
 <button (click)="saveTemplate()">Save Template</button>

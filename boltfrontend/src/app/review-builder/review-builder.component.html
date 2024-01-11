@@ -6,7 +6,8 @@
   <textarea [(ngModel)]="messageText" name="messageText" type="text" placeholder="Insert Message Text Here"></textarea>
 
   <label>Message Description</label>
-  <textarea [(ngModel)]="messageDescription" name="messageDescription" type="text" placeholder="Insert Message Description Here"></textarea>
+  <textarea [(ngModel)]="messageDescription" name="messageDescription" type="text"
+            placeholder="Insert Message Description Here"></textarea>
 
   <label>User Responses</label>
   <div *ngFor="let response of suggestedResponses; let i = index">

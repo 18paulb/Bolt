@@ -14,14 +14,14 @@ exports.handler = async (event) => {
         // Respond with a success message or relevant data
         return {
             statusCode: 200,
-            body: JSON.stringify({ message: 'Success' })
+            body: JSON.stringify({message: 'Success'})
         };
     }
 
     // If the request doesn't have the required properties
     return {
         statusCode: 400,
-        body: JSON.stringify({ message: 'Invalid request' })
+        body: JSON.stringify({message: 'Invalid request'})
     };
 };
 

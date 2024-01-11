@@ -44,7 +44,7 @@ export class TemplateBrowserComponent implements OnInit {
       }
 
       if (result.templateType === "Survey") {
-        this.surveyTemplates.push(new SurveyTemplate(result.questions, result.openingText, result.id))
+        this.surveyTemplates.push(new SurveyTemplate(result.questions, result.openingText, result.closingText, result.id))
       }
     }
   }
@@ -75,7 +75,9 @@ export class TemplateBrowserComponent implements OnInit {
 
     let body: any = {
       "phoneNumbers": compatiblePhoneNumbers,
-      "questions": template.questions
+      "questions": template.questions,
+      "openingText": template.openingText,
+      "closingText": template.closingText
     }
 
     // First save the survey in the database as a new sent survey
@@ -89,7 +91,7 @@ export class TemplateBrowserComponent implements OnInit {
       "phoneNumbers": phoneNumbers
     }
 
-    let res:any = await lastValueFrom(this.http.post("http://localhost:3000/compatibilityCheck/", body))
+    let res: any = await lastValueFrom(this.http.post("http://localhost:3000/compatibilityCheck/", body))
 
     return res.phoneNumbers;
   }

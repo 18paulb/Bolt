@@ -3,6 +3,7 @@ import {ReviewTemplateModel} from "./models/ReviewTemplateModel.js";
 import {SurveyModel} from "./models/SurveyModel.js";
 import {SurveyTemplateModel} from "./models/SurveyTemplateModel.js";
 import {ReviewModel} from "./models/ReviewModel.js";
+import {RecipientModel} from "./models/RecipientModel.js";
 // import {ReviewTemplate} from "../../shared/models/ReviewTemplate.js";
 
 const uri = "mongodb+srv://brandonpaul:Sports18120@bolt.zjlyp8n.mongodb.net/?retryWrites=true&w=majority";
@@ -33,13 +34,13 @@ export async function saveReviewTemplate(template) {
     let reviewModel = new ReviewTemplateModel(template.imageUrl, template.messageText, template.messageDescription, template.suggestedResponses, "brandon")
     reviewModel.templateType = "Review"
 
-    await db.collection('Templates').insertOne(reviewModel);
+    await db.collection('Template').insertOne(reviewModel);
 }
 
 export async function deleteTemplate(templateId) {
     let db = await connectToDatabase();
 
-    let collection = db.collection('Templates');
+    let collection = db.collection('Template');
 
     // Specify the filter criteria to delete by _id
     const filter = {_id: new ObjectId(templateId)};
@@ -54,7 +55,7 @@ export async function getAllTemplates(ownerId) {
     const filter = {};
     filter.ownerId = ownerId;
 
-    let collection = db.collection("Templates")
+    let collection = db.collection("Template")
 
     // Fetch documents matching the filter criteria
     const documents = await collection.find(filter).toArray();
@@ -73,7 +74,7 @@ export async function getAllTemplates(ownerId) {
         }
 
         if (doc.templateType === "Survey") {
-            let model = new SurveyTemplateModel(doc.questions, doc.openingText)
+            let model = new SurveyTemplateModel(doc.questions, doc.openingText, doc.closingText)
             model.id = doc._id.toString()
             model.templateType = "Survey"
             results.push(model)
@@ -84,10 +85,10 @@ export async function getAllTemplates(ownerId) {
     return results;
 }
 
-export async function saveSentSurvey(questions, phoneNumber) {
+export async function saveSentSurvey(questions, phoneNumber, openingText, closingText) {
     let db = await connectToDatabase();
 
-    let surveyModel = new SurveyModel(phoneNumber, questions, Date.now())
+    let surveyModel = new SurveyModel(phoneNumber, questions, openingText, closingText, Date.now())
 
     // Add extra data to the survey, ie hasAnswered/response fields
     for (let i = 0; i < surveyModel.questions.length; ++i) {
@@ -96,10 +97,27 @@ export async function saveSentSurvey(questions, phoneNumber) {
         question.response = null;
     }
 
-    let insertResult = await db.collection('Survey').insertOne(surveyModel);
+    let insertResult = await db.collection('Conversation').insertOne(surveyModel);
+
+    let id = insertResult.insertedId.toString()
+
+    await updateRecipientLastSent(phoneNumber, id)
 
     // Returns the ID of the survey so that we can update it later
-    return insertResult.insertedId.toString()
+    return id
+}
+
+async function updateRecipientLastSent(phoneNumber, lastSentId) {
+    let db = await connectToDatabase();
+
+    let collection = db.collection('Recipient')
+
+    let recipientModel = new RecipientModel(phoneNumber, lastSentId)
+
+    const result = await collection.updateOne(
+        {phoneNumber: phoneNumber}, // Filter criteria: match documents with this surveyId
+        {$set: recipientModel}   // Update operation: set the new values from `survey`
+    );
 }
 
 export async function saveSentReview(review, phoneNumber) {
@@ -109,75 +127,33 @@ export async function saveSentReview(review, phoneNumber) {
     reviewModel.hasResponded = false;
     reviewModel.response = null;
 
-    let insertResult = await db.collection('Review').insertOne(reviewModel)
+    let insertResult = await db.collection('Conversation').insertOne(reviewModel)
 
-    return insertResult.insertedId.toString()
+    let id = insertResult.insertedId.toString()
+
+    await updateRecipientLastSent(phoneNumber, id)
+
+    return id
 }
 
-export async function getReview(reviewId){
+export async function getReview(reviewId) {
     let db = await connectToDatabase();
 
-    const filter = { _id: new ObjectId(reviewId) }
+    const filter = {_id: new ObjectId(reviewId)}
 
-    let collection = db.collection("Review")
-    const documents = await collection.find(filter).toArray();
-
-    return documents[0]
+    let collection = db.collection('Conversation')
+    return await collection.findOne(filter)
 }
 
-export async function getReviewByPhoneNumber(phoneNumber) {
-    let db = await connectToDatabase();
-
-    const filter = { phoneNumber: phoneNumber}
-
-    let collection = db.collection("Review")
-
-    // FIXME: This is not a long term solution for making sure the correct review is fetched
-    // This should get the latest review sent to a phone number
-    const latestDocument = await collection.find(filter)
-        .sort({ date: -1 })
-        .limit(1)
-        .toArray();
-
-    return latestDocument.length > 0 ? latestDocument[0] : null;
-
-}
-
-export async function updateReview(review, reviewId) {
+export async function updateConversation(conversation) {
     try {
         let db = await connectToDatabase();
 
-        const result = await db.collection('Review').updateOne(
-            { _id: new ObjectId(reviewId) }, // Filter criteria: match documents with this surveyId
-            { $set: review }   // Update operation: set the new values from `survey`
+        const result = await db.collection('Conversation').updateOne(
+            {_id: conversation._id}, // Filter criteria: match documents with this surveyId
+            {$set: conversation}   // Update operation: set the new values from `survey`
         );
 
-        // `result` contains information about the operation
-        // For example, you can check if a document was modified:
-        if (result.modifiedCount === 0) {
-            console.log('No document was updated.');
-        } else {
-            console.log('Document updated successfully.');
-        }
-
-        return result;
-    } catch (error) {
-        console.error('Error updating the survey:', error);
-        throw error; // Rethrow the error for further handling if necessary
-    }
-}
-
-export async function updateSurvey(survey, surveyId) {
-    try {
-        let db = await connectToDatabase();
-
-        const result = await db.collection('Survey').updateOne(
-            { _id: new ObjectId(surveyId) }, // Filter criteria: match documents with this surveyId
-            { $set: survey }   // Update operation: set the new values from `survey`
-        );
-
-        // `result` contains information about the operation
-        // For example, you can check if a document was modified:
         if (result.modifiedCount === 0) {
             console.log('No document was updated.');
         } else {
@@ -194,40 +170,38 @@ export async function updateSurvey(survey, surveyId) {
 export async function getSurvey(surveyId) {
     let db = await connectToDatabase();
 
-    const filter = { _id: new ObjectId(surveyId) }
+    const filter = {_id: new ObjectId(surveyId)}
 
-    let collection = db.collection("Survey")
+    let collection = db.collection('Conversation')
 
-    const documents = await collection.find(filter).toArray();
-
-    return documents[0]
-}
-
-export async function getSurveyByPhoneNumber(phoneNumber) {
-    let db = await connectToDatabase();
-
-    const filter = { phoneNumber: phoneNumber}
-
-    let collection = db.collection("Survey")
-
-    // FIXME: This is not a long term solution for making sure the correct survey is fetched
-    // This should get the latest survey sent to a phone number
-    const latestDocument = await collection.find(filter)
-        .sort({ date: -1 })
-        .limit(1)
-        .toArray();
-
-    return latestDocument.length > 0 ? latestDocument[0] : null;
-
+    return await collection.findOne(filter)
 }
 
 export async function saveSurveyTemplate(survey) {
     let db = await connectToDatabase();
 
-    let collection = db.collection("Templates")
+    let collection = db.collection('Template')
 
-    let surveyModel = new SurveyTemplateModel(survey.questions, survey.openingText, "brandon");
-    surveyModel.templateType = "Survey"
+    let surveyModel = new SurveyTemplateModel(survey.questions, survey.openingText, survey.closingText, "brandon");
+    surveyModel.templateType = 'Survey'
 
     await collection.insertOne(surveyModel);
+}
+
+export async function getLatestSent(msisdn) {
+    let db = await connectToDatabase();
+
+    let collection = db.collection('Recipient')
+
+    let filter = {phoneNumber: msisdn}
+
+    const recipient = await collection.findOne(filter);
+
+    if (recipient == null) return null;
+
+    collection = db.collection('Conversation')
+
+    filter = {_id: new ObjectId(recipient.lastSent)}
+
+    return await collection.findOne(filter)
 }

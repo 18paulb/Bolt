@@ -3,7 +3,7 @@ import {PubSub} from '@google-cloud/pubsub';
 import * as db from './Database/db.js'
 import * as richCard from './Agents/richCard.js'
 
-import rbmPrivatekey from './Agents/rbm-credentials.json' assert {type: 'json'};
+import rbmPrivateKey from './Agents/rbm-credentials.json' assert {type: 'json'};
 import rbmApiHelper from '@google/rcsbusinessmessaging'
 import cors from "cors";
 
@@ -15,8 +15,8 @@ const subscriptionName = 'projects/rbm-test-vgw4szq/subscriptions/rbm-agent-subs
 
 // initialize Pub/Sub for pull subscription listener
 // this is how this agent will receive messages from the client
-rbmApiHelper.initRbmApi(rbmPrivatekey);
-initPubsub();
+rbmApiHelper.initRbmApi(rbmPrivateKey);
+initPubSub();
 
 app.use(
     cors({
@@ -31,24 +31,28 @@ app.use(express.json());
  */
 app.post('/startSurvey', async function (req, res, next) {
     try {
-
         let surveyIdMap = req.body
-
-        const messageText = 'Thanks for agreeing to participate in this survey, to opt out, please respond STOP';
 
         for (const [phoneNumber, surveyId] of Object.entries(surveyIdMap)) {
             let survey = await db.getSurvey(surveyId)
 
             const params = {
-                messageText: messageText,
-                msisdn: phoneNumber,
+                messageText: survey.openingText,
+                msisdn: phoneNumber
             };
 
             // 1. First this sends a message via params
             // 2. The callback function is then called (the 2nd parameter) after sendMessage is complete
             await rbmApiHelper.sendMessage(params,
                 function (response, err) {
-                    sendSurveyQuestion(phoneNumber, survey.questions[0])
+
+                    if (response != null) {
+                        sendSurveyQuestion(phoneNumber, survey.questions[0])
+                    }
+
+                    if (err != null) {
+                        console.log("There is something wrong with the message you are trying to send")
+                    }
                 });
         }
 
@@ -103,7 +107,6 @@ function sendSurveyQuestion(msisdn, question) {
         suggestions: suggestions,
     };
 
-    // TODO: Consider changing this, is the Promise really needed?
     return new Promise(function (resolve, reject) {
         rbmApiHelper.sendMessage(params,
             function (response) {
@@ -123,43 +126,39 @@ function sendSurveyQuestion(msisdn, question) {
  * @returns {Promise<void>}
  */
 async function handleSurveyMessage(msisdn, message) {
-    let survey = await db.getSurveyByPhoneNumber(msisdn)
+    let survey = await db.getLatestSent(msisdn)
+
+    if (msisdn !== survey.phoneNumber) return null;
 
     // Save the answer to the question
-    for (let i = 0; i < survey.questions.length; ++i) {
-        if (!survey.questions[i].hasResponded) {
-            survey.questions[i].hasResponded = true;
-            survey.questions[i].response = message
-            break;
-        }
+    const unansweredQuestion = survey.questions.find(question => !question.hasResponded);
+
+    if (unansweredQuestion) {
+        unansweredQuestion.hasResponded = true;
+        unansweredQuestion.response = message;
+        // Update the survey in the database to have the most recent answer
+        db.updateConversation(survey).catch(console.dir)
+
     }
 
-    // Update the survey in the database to have the most recent answer
-    db.updateSurvey(survey, survey._id.toString()).catch(console.dir)
+    const allQuestionsAnswered = survey.questions.every(question => question.hasResponded);
 
-    // Go to the next question in the survey and send that
-    let allQuestionsAnswered = true;
-    if (msisdn === survey.phoneNumber) {
-        for (let i = 0; i < survey.questions.length; ++i) {
-            console.log(survey.questions[i]);
-            if (!survey.questions[i].hasResponded) {
-                allQuestionsAnswered = false;
-                sendSurveyQuestion(msisdn, survey.questions[i]).catch(console.dir)
-                break;
-            }
-        }
-    }
-
-    if (allQuestionsAnswered) {
+    if (!allQuestionsAnswered) {
+        const unansweredQuestion = survey.questions.find(question => !question.hasResponded);
+        sendSurveyQuestion(msisdn, unansweredQuestion).catch(console.dir);
+    } else {
         const params = {
-            messageText: "Thank you for completing the survey!",
+            messageText: survey.closingText,
             msisdn: msisdn,
         };
-        await rbmApiHelper.sendMessage(params,
-            function (response, err) {
-                console.log("Survey is done")
-            });
+
+        //TODO: Consider after survey is completed to mark the Recipient "lastSent" as null so that nothing will be sent back
+        //  and we can ignore messages that are not answering anything
+
+
+        await rbmApiHelper.sendMessage(params, null);
     }
+
 }
 
 /**
@@ -169,22 +168,21 @@ async function handleSurveyMessage(msisdn, message) {
  * @returns {Promise<void>}
  */
 async function handleReviewMessage(msisdn, message) {
-    let review = await db.getReviewByPhoneNumber(msisdn, message)
+    let review = await db.getLatestSent(msisdn)
 
     review.hasResponded = true
     review.response = message
 
-    db.updateReview(review, review._id).catch(console.dir)
+    db.updateConversation(review).catch(console.dir)
 }
 
 /**
  * Uses the event received by the pull subscription to send a
  * response to the client's device.
  * @param {object} userEvent The JSON object of a message received by the pull subscription.
- * Depending on the postbackData of the response, different logic will be applied (ie handle survey vs review response
+ * Grabs the most recent conversation of that phoneNumber and saves the response
  */
 async function handleMessage(userEvent) {
-    // get the sender's phone number
     const msisdn = userEvent.senderPhoneNumber
 
     if (msisdn !== undefined) {
@@ -198,17 +196,25 @@ async function handleMessage(userEvent) {
         // check to see that we have a message to process
         if (message) {
 
-            //FIXME: If there is no message postback data to suggested responses this won't work (ie a free response)
-            // Ideas for how to fix this:
-            // 1. We could make it so that any text after a question goes to the answer of that question (but then if they make a mistake text that would screw things up as we would only take the immediate next text)
-            if (userEvent.suggestionResponse.postbackData.includes("SURVEY")) {
-                await handleSurveyMessage(msisdn, message)
-            } else if (userEvent.suggestionResponse.postbackData.includes("REVIEW")) {
-                await handleReviewMessage(msisdn, message)
+            // TODO: Doesn't unsubscribe right now but at least sends the message
+            if (message === "STOP") {
+                await handleUnsubscribeMessage(message, msisdn)
+                return;
             }
-            // This means that they do not do a suggested response, so either it is open-ended question or they did not answer correctly
-            else if (userEvent.suggestionResponse == null) {
 
+            let conversation = await db.getLatestSent(msisdn)
+
+            switch (conversation.templateType) {
+                case "Survey":
+                    await handleSurveyMessage(msisdn, message)
+                    break;
+
+                case "Review":
+                    await handleReviewMessage(msisdn, message)
+                    break;
+
+                default:
+                    console.log("Something went wrong because it should either be Survey or Review")
             }
         }
     }
@@ -231,14 +237,24 @@ function getMessageBody(userEvent) {
     return false;
 }
 
+async function handleUnsubscribeMessage(message, phoneNumber) {
+
+    const params = {
+        messageText: "You have successfully unsubscribed, no more messages will be sent to you",
+        msisdn: phoneNumber
+    };
+
+    await rbmApiHelper.sendMessage(params, null)
+}
+
 /**
  * Initializes a pull subscription message handler
  * to receive messages from Pub/Sub.
  */
-function initPubsub() {
+function initPubSub() {
 
     const pubsub = new PubSub({
-        projectId: rbmPrivatekey.project_id,
+        projectId: rbmPrivateKey.project_id,
         keyFilename: './Agents/rbm-credentials.json',
     });
 
@@ -262,9 +278,8 @@ function initPubsub() {
     // Listen for new messages until timeout is hit
     subscription.on('message', messageHandler);
 
-    console.log('initPubsub done');
+    console.log('initPubSub done');
 }
-
 
 app.listen(port, () => {
     console.log("listening on port " + port)

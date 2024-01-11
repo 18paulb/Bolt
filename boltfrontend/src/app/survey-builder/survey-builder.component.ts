@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {HttpClient} from "@angular/common/http";
 import {lastValueFrom} from "rxjs";
-import {SurveyTemplate, Question} from "../../../../shared/models/SurveyTemplate"
+import {Question, SurveyTemplate} from "../../../../shared/models/SurveyTemplate"
+
 
 @Component({
   selector: 'app-survey-builder',
@@ -10,42 +11,53 @@ import {SurveyTemplate, Question} from "../../../../shared/models/SurveyTemplate
 })
 export class SurveyBuilderComponent {
 
-  constructor(private http:HttpClient) {
+  constructor(private http: HttpClient) {
   }
 
-  questions:Question[] = []
+  questions: Question[] = []
 
-  currQuestion:string = ""
+  currQuestion: string = ""
 
-  suggestedAnswers:string[] = []
+  suggestedResponses: string[] = []
 
-  newResponse:string = ""
+  newResponse: string = ""
 
-  openingText:string = ""
+  openingText: string = ""
+
+  closingText: string = ""
 
   addQuestion() {
-    let newQuestion:Question = new Question(this.currQuestion, this.suggestedAnswers)
+    let newQuestion: Question = new Question(this.currQuestion, this.suggestedResponses)
     this.questions.push(newQuestion)
 
-    this.suggestedAnswers = []
+    this.suggestedResponses = []
     this.currQuestion = ""
   }
 
   async saveTemplate() {
-    let survey:SurveyTemplate = new SurveyTemplate(this.questions, this.openingText, "")
+
+    let survey: SurveyTemplate = new SurveyTemplate(this.questions, this.openingText, this.closingText, "")
 
     await lastValueFrom(this.http.post("http://localhost:3000/surveyTemplate", survey))
 
     this.questions = []
+    this.suggestedResponses = []
+    this.openingText = ""
+    this.closingText = ""
+    this.newResponse = ""
   }
 
   addUserResponse() {
-    this.suggestedAnswers.push(this.newResponse);
+    if (this.suggestedResponses.length >= 11) return;
+
+    if (this.newResponse.length == 0) return;
+
+    this.suggestedResponses.push(this.newResponse);
     this.newResponse = ""
   }
 
   removeUserResponse(index: number) {
-    this.suggestedAnswers.splice(index, 1);
+    this.suggestedResponses.splice(index, 1);
   }
 
 }

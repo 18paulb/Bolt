@@ -8,6 +8,7 @@ export class ReviewModel {
     hasResponded
     response
     _id
+    templateType
 
 
     constructor(imageUrl, messageText, messageDescription, suggestedResponses, phoneNumber, date) {
@@ -17,5 +18,6 @@ export class ReviewModel {
         this.suggestedResponses = suggestedResponses;
         this.phoneNumber = phoneNumber;
         this.date = date;
+        this.templateType = "Review";
     }
 }

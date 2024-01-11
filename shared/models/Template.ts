@@ -1,7 +1,7 @@
 export abstract class Template {
-    objectId:string
+    objectId: string
 
-    protected constructor(objectId:string) {
+    protected constructor(objectId: string) {
         this.objectId = objectId;
     }
 }

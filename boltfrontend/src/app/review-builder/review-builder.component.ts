@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
-import { HttpClient} from "@angular/common/http";
-import { lastValueFrom} from "rxjs";
-import { ReviewTemplate } from "../../../../shared/models/ReviewTemplate"
+import {Component} from '@angular/core';
+import {HttpClient} from "@angular/common/http";
+import {lastValueFrom} from "rxjs";
+import {ReviewTemplate} from "../../../../shared/models/ReviewTemplate"
 
 @Component({
   selector: 'app-review-builder',
@@ -13,23 +13,25 @@ export class ReviewBuilderComponent {
   constructor(private http: HttpClient) {
   }
 
-  imageUrl:string = "https://storage.googleapis.com/kitchen-sink-sample-images/cute-dog.jpg"
+  imageUrl: string = "https://storage.googleapis.com/kitchen-sink-sample-images/cute-dog.jpg"
 
-  messageText:string = "TEST"
+  messageText: string = "TEST"
 
-  messageDescription:string = "This is a test from a node.js server, is this cool?"
+  messageDescription: string = "This is a test from a node.js server, is this cool?"
 
-  suggestedResponses:Array<string> = ["yes", "no"]
+  suggestedResponses: Array<string> = ["yes", "no"]
 
-  newResponse:string = ""
+  newResponse: string = ""
 
   async sendText() {
-    let review:ReviewTemplate = new ReviewTemplate(this.imageUrl, this.messageText, this.messageDescription, this.suggestedResponses, "")
+    let review: ReviewTemplate = new ReviewTemplate(this.imageUrl, this.messageText, this.messageDescription, this.suggestedResponses, "")
     const data = await lastValueFrom(this.http.post("http://localhost:3000/reviewTemplate", review));
     console.log(data)
   }
 
   addUserResponse() {
+    if (this.suggestedResponses.length >= 11) return;
+
     this.suggestedResponses.push(this.newResponse);
     this.newResponse = ""
   }
