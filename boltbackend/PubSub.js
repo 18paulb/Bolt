@@ -123,10 +123,10 @@ function sendSurveyQuestion(msisdn, question) {
  * Handles a message response to a survey
  * @param msisdn - the phone number that sent the response
  * @param message - the message text the phone number sent
+ * @param survey - The survey that is being updated
  * @returns {Promise<void>}
  */
-async function handleSurveyMessage(msisdn, message) {
-    let survey = await db.getLatestSent(msisdn)
+async function handleSurveyMessage(msisdn, message, survey) {
 
     if (msisdn !== survey.phoneNumber) return null;
 
@@ -160,17 +160,16 @@ async function handleSurveyMessage(msisdn, message) {
 
         await db.updateRecipient(recipient);
     }
-
 }
 
 /**
  * Handles a message response to a review
  * @param msisdn - The phone number that is responding
  * @param message - The response that is received
+ * @param review - The review
  * @returns {Promise<void>}
  */
-async function handleReviewMessage(msisdn, message) {
-    let review = await db.getLatestSent(msisdn)
+async function handleReviewMessage(msisdn, message, review) {
 
     review.hasResponded = true
     review.response = message
@@ -212,11 +211,11 @@ async function handleMessage(userEvent) {
 
             switch (conversation.templateType) {
                 case "Survey":
-                    await handleSurveyMessage(msisdn, message)
+                    await handleSurveyMessage(msisdn, message, conversation)
                     break;
 
                 case "Review":
-                    await handleReviewMessage(msisdn, message)
+                    await handleReviewMessage(msisdn, message, conversation)
                     break;
 
                 default:
