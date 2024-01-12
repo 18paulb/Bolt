@@ -188,20 +188,44 @@ export async function saveSurveyTemplate(survey) {
     await collection.insertOne(surveyModel);
 }
 
-export async function getLatestSent(msisdn) {
+export async function getRecipient(phoneNumber) {
+
     let db = await connectToDatabase();
 
     let collection = db.collection('Recipient')
 
-    let filter = {phoneNumber: msisdn}
+    let filter = {phoneNumber: phoneNumber}
 
-    const recipient = await collection.findOne(filter);
+    return await collection.findOne(filter);
+}
+
+export async function updateRecipient(recipient) {
+    let db = await connectToDatabase();
+
+    const result = await db.collection('Recipient').updateOne(
+        {_id: recipient._id}, // Filter criteria: match documents with this surveyId
+        {$set: recipient}   // Update operation: set the new values from `survey`
+    );
+
+    if (result.modifiedCount === 0) {
+        console.log('No document was updated.');
+    } else {
+        console.log('Document updated successfully.');
+    }
+
+    return result;
+}
+
+export async function getLatestSent(msisdn) {
+    let db = await connectToDatabase();
+
+    let recipient = await getRecipient(msisdn)
 
     if (recipient == null) return null;
 
-    collection = db.collection('Conversation')
+    let collection = db.collection('Conversation')
 
-    filter = {_id: new ObjectId(recipient.lastSent)}
+    let filter = {_id: new ObjectId(recipient.lastSent)}
 
     return await collection.findOne(filter)
 }
