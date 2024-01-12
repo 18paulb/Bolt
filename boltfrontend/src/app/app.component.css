@@ -1,0 +1,16 @@
+<<<<<<< Updated upstream
+=======
+.text-box {
+  display: flex;
+  width: 300px;
+  height: 100px;
+}
+
+.rcs-builder {
+  display: flex;
+}
+
+.survey-builder {
+  margin: 0 50px 0 20px;
+}
+>>>>>>> Stashed changes
